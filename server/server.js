@@ -9,6 +9,10 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({extended: true}));
 
 
+
+
+
+// api insertbarang
 app.get('/api/InsterBarang', (req, res) => {
     const nama_barang = "mie instans";
     const quantyty =  1;
@@ -24,6 +28,8 @@ app.get('/api/InsterBarang', (req, res) => {
 }); 
 
 
+
+//  api  insert kategori
 app.get('/api/InsetKategori', (req, res) => {
     const nama_kategori = req.params.nama_kategori;
     const sqlInsert = `INSERT INTO kategori (nama_kategori) VALUES ('${nama_kategori}') `
@@ -33,7 +39,12 @@ app.get('/api/InsetKategori', (req, res) => {
         }
         if(err) throw err;
     });
-})
+});
+
+
+
+
+
 
 
 
