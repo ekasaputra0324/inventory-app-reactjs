@@ -1,51 +1,55 @@
 const express = require('express')
 const app = express();
 const cors = require('cors')
-const {client} = require('./connection/db');
+const { pool } = require('./db');
 const bodyParser = require('body-parser');
-
-app.use(cors());
+const session = require('express-session');
+require('dotenv').config();
+const helmet = require('helmet');
+const server = require('http').createServer(app);
+const routeIndex = require('./routers/route');
+const { Server } = require('socket.io');
+const bycrpt = require('bcrypt');
 app.use(express.json())
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:3000',
+        credentials: true
+    }
+})
+app.use(helmet());
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+}));
 
 
-
-// api insertbarang
-app.get('/api/InsterBarang', (req, res) => {
-    const nama_barang = "mie instans";
-    const quantyty =  1;
-    const tanggal_barang = new Date().toISOString();
-    const sqlInsert = `INSERT INTO barang (nama_barang , jumlah, created_at, status_barang,kategori_id) 
-                       VALUES ('${nama_barang}','${quantyty}','${tanggal_barang}',${false},${1})`
-    client.query(sqlInsert,  (err, result) => {
-        if (!err) {
-            console.log("data barang berhasil di tambahkan");
+app.use(
+    session({
+        secret: process.env.COOKIE_SECRET,
+        credentials: true,
+        name: "sid",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: process.env.ENVIRONMENT === "production",
+            httpOnly: true,
+            sameSite: process.env.ENVIRONMENT === "production" ? "none" : "lax"
         }
-        if(err) throw err;
-    }) ;
-}); 
-
-
-
-//  api  insert kategori
-app.get('/api/InsetKategori', (req, res) => {
-    const nama_kategori = req.params.nama_kategori;
-    const sqlInsert = `INSERT INTO kategori (nama_kategori) VALUES ('${nama_kategori}') `
-    client.query(sqlInsert, (err, result) => {
-        if (!err) {
-            console.log("data kategori berhasi di tambahkan");
-        }
-        if(err) throw err;
-    });
-});
+    })
+)
+ 
+app.use('/', routeIndex); 
 
 
 
 
 
 
+io.on('connect', socket => { });
 
 
 app.listen(5000, () => {
