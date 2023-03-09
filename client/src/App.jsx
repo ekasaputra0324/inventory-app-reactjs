@@ -5,9 +5,9 @@ import LoginPage from './components/page/login';
 import useToken from './token/useToken';
 
 
-
 function App() {
     const {token ,setToken } = useToken();
+       
     if (!token) {
         return < LoginPage setToken={setToken} />;
     }

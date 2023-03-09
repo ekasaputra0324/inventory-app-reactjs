@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 
+
+
 async function loginUser(credentials) {
   return fetch('http://localhost:5000/login', {
      method: 'POST',
@@ -15,8 +17,15 @@ async function loginUser(credentials) {
 
 
 export default function Login  ({ setToken }) {
+
     const [name , SetUserName ] = useState();
     const [password , SetUserPassword] = useState();
+    const [eror, setEror] = useState(true);
+
+    const onChangeCheckbox = e => {
+      e.preventDefault();
+
+    }
 
     const handleSubmit = async e => {
       e.preventDefault();
@@ -24,14 +33,17 @@ export default function Login  ({ setToken }) {
         name,
         password,
       });
+      setEror(token.LoggedIn);
       setToken(token)
     }
+   
+    
 
     return (
       <div>
         <div class="login-box" 
         style={{ 
-          marginTop: "13%",
+          marginTop: "10%",
           marginLeft: "37%", 
         }}>
         <div className="login-logo">
@@ -39,6 +51,11 @@ export default function Login  ({ setToken }) {
             <b>Inventory</b>APP
           </a>
         </div>
+        {eror ? '' 
+        :<div class="alert alert-danger" role="alert">        
+          make sure your password and username are correct.
+         </div>
+        }
         <div className="card">
           <div className="card-body login-card-body">
             <p className="login-box-msg">Login in to start your session</p>
@@ -48,6 +65,7 @@ export default function Login  ({ setToken }) {
                   type="name"
                   className="form-control"
                   placeholder="Username"
+                  
                   onChange={e => SetUserName(e.target.value)}
                 />
                 <div className="input-group-append">
