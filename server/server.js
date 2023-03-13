@@ -1,7 +1,6 @@
 const express = require('express')
 const app = express();
 const cors = require('cors')
-const { pool } = require('./db');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 require('dotenv').config();
@@ -9,10 +8,9 @@ const helmet = require('helmet');
 const server = require('http').createServer(app);
 const routeIndex = require('./routers/route');
 const { Server } = require('socket.io');
-const bycrpt = require('bcrypt');
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.set('view engine', 'ejs');
 
 const io = new Server(server, {
     cors: {
@@ -20,6 +18,7 @@ const io = new Server(server, {
         credentials: true
     }
 })
+
 app.use(helmet());
 app.use(cors({
     origin: "http://localhost:3000",
@@ -43,12 +42,6 @@ app.use(
 )
  
 app.use('/', routeIndex); 
-
-
-
-
-
-
 io.on('connect', socket => { });
 
 

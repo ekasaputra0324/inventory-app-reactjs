@@ -1,27 +1,39 @@
 import React from 'react'
 import Index from './components/index';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route,  Switch } from 'react-router-dom';
 import LoginPage from './components/page/login';
 import useToken from './token/useToken';
-
+import ForgotPage from './components/index/forgot';
 
 function App() {
-    const {token ,setToken } = useToken();
-       
+    const { token, setToken } = useToken();
+
     if (!token) {
-        return < LoginPage setToken={setToken} />;
+        return (
+            <div>
+            <Router>
+                <Switch>
+                    <Route exact path='/' render={(props)  => < LoginPage setToken={setToken} />}></Route> 
+                    <Route exact path='/forgot' render={(props)  => < ForgotPage />}></Route> 
+               </Switch>
+            </Router>
+            </div>
+        )
     }
-    return ( 
+
+    return (
         <div>
-            <BrowserRouter>
+            <Router>
                 <Switch>
                     < Route path='/'>
                         <Index />
                     </Route>
                 </Switch>
-            </ BrowserRouter>
+            </Router>
         </div>
     )
+   
+    
 }
 
 

@@ -1,6 +1,14 @@
 import React, { Component } from 'react'
 
+
 export default class navbar extends Component {
+  
+
+  logout(){
+    localStorage.removeItem('token')
+    window.location.href = '/'
+  }
+
   render() {
     return (
       <nav className="main-header navbar navbar-expand navbar-white navbar-light">
@@ -34,8 +42,8 @@ export default class navbar extends Component {
           </li>
            
           <li className="nav-item">
-            <a className="nav-link" data-toggle="dropdown" href="#">
-            <i className="fas fa-sign-out-alt"></i>
+            <a className="nav-link" data-toggle="dropdown" href="">
+            <i className="fas fa-sign-out-alt"  onClick={this.logout}></i>
             </a>
           </li>
         </ul>

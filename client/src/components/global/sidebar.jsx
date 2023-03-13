@@ -28,7 +28,6 @@ export default class sidebar extends Component {
               </div>
               <div className="info">
                 <a href="#" className="d-block">
-                  Alexander Pierce
                 </a>
               </div>
             </div>

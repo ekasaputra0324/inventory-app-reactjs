@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
-
+import ForgotPage from "../index/forgot";
+import { Link } from "react-router-dom";
 
 async function loginUser(credentials) {
   return fetch('http://localhost:5000/login', {
@@ -18,27 +18,26 @@ async function loginUser(credentials) {
 
 export default function Login  ({ setToken }) {
 
-    const [name , SetUserName ] = useState();
-    const [password , SetUserPassword] = useState();
+    /*
+    use state yang 
+    digunakan untuk memanipulasi variabel 
+    */
+    const [email , SetEmail ] = useState("");
+    const [password , SetUserPassword] = useState("");
     const [eror, setEror] = useState(true);
 
-    const onChangeCheckbox = e => {
-      e.preventDefault();
-
-    }
 
     const handleSubmit = async e => {
       e.preventDefault();
       const token = await loginUser({
-        name,
+        email,
         password,
       });
       setEror(token.LoggedIn);
       setToken(token)
     }
+  
    
-    
-
     return (
       <div>
         <div class="login-box" 
@@ -58,16 +57,15 @@ export default function Login  ({ setToken }) {
         }
         <div className="card">
           <div className="card-body login-card-body">
-            <p className="login-box-msg">Login in to start your session</p>
+            <p className="login-box-msg">Sign in to start your app</p>
             <form onSubmit={handleSubmit}>
               <div className="input-group mb-3">
                 <input
-                  type="name"
+                  type="email"
                   className="form-control"
-                  placeholder="Username"
-                  
-                  onChange={e => SetUserName(e.target.value)}
-                />
+                  placeholder="Email"
+                  onChange={e => SetEmail(e.target.value)}
+                 />
                 <div className="input-group-append">
                   <div className="input-group-text">
                     <span className="fas fa-user" />
@@ -78,7 +76,7 @@ export default function Login  ({ setToken }) {
                 <input
                   type="password"
                   className="form-control"
-                  placeholder="Password"
+                  placeholder="Password" 
                   onChange={e => SetUserPassword(e.target.value)}
                 />
                 <div className="input-group-append">
@@ -89,14 +87,11 @@ export default function Login  ({ setToken }) {
               </div>
               <div className="row">
                 <div className="col-8">
-                  <div className="icheck-primary">
-                    <input type="checkbox" id="remember"/> 
-                    <label htmlFor="remember">Remember Me</label>
-                  </div>
-                </div>
+                  <Link to="/forgot" >i forgot my password.</Link>
+                 </div>
                 <div className="col-4">
                   <button type="submit" className="btn btn-primary btn-block">
-                    Login
+                    Sign in
                   </button>
                 </div>
               </div>
@@ -106,6 +101,9 @@ export default function Login  ({ setToken }) {
         </div>
       </div>
     );
+
+    
+ 
   }
 
 Login.propTypes = {
