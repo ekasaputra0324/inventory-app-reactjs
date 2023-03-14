@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route,  Switch } from 'react-router-dom';
 import LoginPage from './components/page/login';
 import useToken from './token/useToken';
 import ForgotPage from './components/index/forgot';
+import Resetpassword from './components/page/resetpass';
 
 function App() {
     const { token, setToken } = useToken();
@@ -14,7 +15,8 @@ function App() {
             <Router>
                 <Switch>
                     <Route exact path='/' render={(props)  => < LoginPage setToken={setToken} />}></Route> 
-                    <Route exact path='/forgot' render={(props)  => < ForgotPage />}></Route> 
+                    <Route exact path='/forgot' render={(props)  => < ForgotPage />}></Route>
+                    <Route exact path='/reset_password/:token' render={(props)  => < Resetpassword />}></Route> 
                </Switch>
             </Router>
             </div>

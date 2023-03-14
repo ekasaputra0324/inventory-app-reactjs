@@ -18,15 +18,12 @@ async function loginUser(credentials) {
 
 export default function Login  ({ setToken }) {
 
-    /*
-    use state yang 
-    digunakan untuk memanipulasi variabel 
-    */
+    // variabel penampun data mengunakan useState() 
     const [email , SetEmail ] = useState("");
     const [password , SetUserPassword] = useState("");
     const [eror, setEror] = useState(true);
 
-
+    // handle submit 
     const handleSubmit = async e => {
       e.preventDefault();
       const token = await loginUser({

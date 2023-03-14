@@ -28,19 +28,24 @@ export default function Forgotpassword () {
       email
     });
     localStorage.status = request.status
-    const statusCode = localStorage.status
-    setEror(JSON.parse(statusCode))
-  }
-  let errhandle
-  if (eror == true) {
-     errhandle =  <div class="alert alert-success" role="alert">        
-                     Send to email successful check your email
-                     </div>
-  }else if (eror == false) {
-    errhandle =   <div class="alert alert-danger" role="alert">        
-                     Your email is not registered
-                  </div>
-  }
+
+    if (JSON.parse(localStorage.status) == true) {
+        setEror(<div class="alert alert-success" role="alert">        
+                  Send to email successful check your email
+                </div>)
+
+   }else if (JSON.parse(localStorage.status) == false) {
+
+    setEror(<div class="alert alert-danger" role="alert">        
+            Your email is not registered
+          </div>)
+            
+   }
+ 
+}
+  
+ 
+ 
 
     return (
         <div className="login-box" 
@@ -52,8 +57,7 @@ export default function Forgotpassword () {
       <div className="login-logo">
         <a href="">Reset <b>Password</b></a>
       </div>
-      {errhandle}
-      {/* /.login-logo */}
+      {eror}
       <div className="card">
         <div className="card-body login-card-body">
           <p className="login-box-msg">To reset your password, enter the email address you used to sign up.</p>
