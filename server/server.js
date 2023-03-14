@@ -7,10 +7,15 @@ require('dotenv').config();
 const helmet = require('helmet');
 const server = require('http').createServer(app);
 const routeIndex = require('./routers/route');
+const path = require('path');
 const { Server } = require('socket.io');
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
 app.set('view engine', 'ejs');
+app.set(express.static(path.join(__dirname, 'public')));
+
 
 const io = new Server(server, {
     cors: {
@@ -40,7 +45,8 @@ app.use(
         }
     })
 )
- 
+
+
 app.use('/', routeIndex); 
 io.on('connect', socket => { });
 

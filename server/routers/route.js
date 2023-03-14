@@ -4,8 +4,7 @@ const { pool } = require("../db");
 const bycrpt = require("bcrypt");
 require("dotenv").config();
 const nodemailer = require("nodemailer");
-const randomstring = require('randomstring');
-
+const randomstring = require("randomstring");
 
 // route login
 router.post("/login", async (req, res) => {
@@ -60,15 +59,15 @@ router.post("/login", async (req, res) => {
 // router forgot password
 router.post("/reset_password", async (req, res) => {
   let email = req.body.email;
+  let date = new Date().toUTCString();
   // pengecekan data berdasarkan  email
   const userData = await pool.query(
     `SELECT * FROM users WHERE email = '${email}'`
   );
   if (userData.rowCount > 0) {
-    //create token mengunakan users id
-    
-    const token = randomstring.generate(); 
-    console.log(token);
+
+    //generte token mengunakan users id
+    const token = randomstring.generate();
     // set email pengirim
     let mailTransporter = nodemailer.createTransport({
       service: "gmail",
@@ -81,45 +80,76 @@ router.post("/reset_password", async (req, res) => {
     let detail = {
       from: "tlpatiglobalnetwork@gmail.com",
       to: userData.rows[0].email,
-      subject: "forgot password",
-      text: "link reset password : http://localhost:5000/change_password/".concat(token),
+      subject: "reset password",
+      text: `Hi ${userData.rows[0].name}, There was a request to change your password! 
+            If you did not make this request then please ignore this email. Otherwise,
+            please click this link to change your password: http://localhost:3000/reset_password/${token}`,
     };
-    
+
     // mengirimkan email dengan function senMail yang telah di sediakan oleh nodemailer
     mailTransporter.sendMail(detail, async (err) => {
+      // eror hendle
       if (err) {
         res.status(500).json({
           status: false,
           message: err,
         });
       } else {
-        const insertResPass = await pool.query(
-          `INSERT INTO reset_passwords (token_user, email) 
-                                                VALUES ($1, $2)`,
-          [token, userData.rows[0].email]
+        // insert data di reset password
+        await pool.query(
+          `INSERT INTO reset_passwords (token_user, email, date) 
+           VALUES ('${token}', '${userData.rows[0].email}', '${date}')`
         );
         res.status(200).json({
-            status: true,
-            message: detail,
-          });
+          status: true,
+          message: detail, 
+        });
       }
     });
-  }else{
+    
+  } else {
     res.status(400).json({
-        status: false,
-        message: 'bad request',
+      status: false,
+      message: "bad request",
     });
   }
 });
 
-router.get('/change_password/:token',  async(req, res) =>{
-    const token = req.params.token;
-    const searchToken = await pool.query(`SELECT * FROM reset_passwords WHERE token_user = '${token}'`);
-    if (searchToken.rowCount > 0) {
-        res.render('change-password');
-    }else{
-        res.render('expried');
-    }
-});
+
+router.post("/change_password", async (req, res) => {
+
+  // variabel penampung data yang di kirimkan dari client side
+  const token = req.body.token;
+  const password = req.body.password;
+  // hashing password
+  const passwordHash = bycrpt.hashSync(password,10)
+  
+  // pencarian data mengunkan berdasarkan token user
+  const searchData = await pool.query(
+    `SELECT * FROM reset_passwords WHERE token_user = '${token}'`
+    );
+ 
+  //validasi jika data token tidak di temukan 
+  if (searchData.rowCount < 1) {
+     res.status(500).json({
+      status: false,
+      message: 'Your token has been used!'
+    });
+
+  }else if(searchData.rowCount > 0){
+   await pool.query(
+        `UPDATE users SET password = '${passwordHash}' WHERE email = '${searchData.rows[0].email}'`
+        );
+   await pool.query(
+            `DELETE FROM reset_passwords WHERE token_user = '${token}'`
+      );
+      res.status(500).json({
+        status: true,
+        message: 'Change password successfully'
+      });
+  }
+    
+
+})
 
 module.exports = router;
