@@ -1,7 +1,68 @@
 import React, { Component } from 'react'
 
+// add products
+async function addProduct  (data) {
+  return fetch('http://localhost:5000/product/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+  }).then(data => data.json())
+}
+
 
 export default class barang extends Component {
+    constructor(props){
+      super(props);
+      // menampung value dari form add product
+      this.state = {
+        name: '',
+        price: '',
+        quantity: '',
+        image: '',
+        request: ''
+      }
+      // handle value input
+      this.handleNameChange = this.handleNameChange.bind(this);
+      this.handlePriceChange = this.handlePriceChange.bind(this);
+      this.handleQuantityChange = this.handleQuantityChange(this);
+      this.handleImageChange = this.handleImageChange(this);
+    }
+
+    // handle name
+    handleNameChange(e){
+      this.setState({ name: e.target.value });
+    }
+    // handle price
+    handlePriceChange(e){
+      this.setState({ price: e.target.value });
+    }
+    // handle quantity
+    handleQuantityChange(e){
+      this.setState({ quantity: e.target.value });
+    }
+    // handle image
+    handleImageChange(e){
+      this.setState({ image: e.target.value })
+    }
+    // handle submit
+    async handleSubmit(e){
+      e.preventDefault();
+      
+       const name = this.state.name
+       const price = this.state.price
+       const quantity = this.state.quantity
+       const image = this.state.image
+      
+      const add = await addProduct({
+          name,
+          price,
+          quantity,
+          image        
+      });
+      console.log(add); 
+    }
   render() {
     return (
       <div>
@@ -16,12 +77,13 @@ export default class barang extends Component {
                 </div>
                 <div className="col-sm-6">
                   <ol className="breadcrumb float-sm-right">
-                    <li className="breadcrumb-item"><a href="#">Products</a></li>
-                    <li className="breadcrumb-item active">Master Data</li>
+                    <li className="breadcrumb-item"><a href="#">Home</a></li>
+                    <li className="breadcrumb-item active">Products</li>
                   </ol>
                 </div>
               </div>
-            </div>{/* /.container-fluid */}
+            </div>
+            {/* /.container-fluid */}
           </section>
           {/* Main content */}
           <section className="content mb-4">
@@ -37,6 +99,7 @@ export default class barang extends Component {
                       textAlign: "center"
                       }}
                     >
+                      <th>Item Code</th>
                       <th>Name</th>
                       <th>Price</th>
                       <th>Quantity</th>
@@ -49,6 +112,7 @@ export default class barang extends Component {
                       textAlign: "center"
                       }}
                     >
+                      <td>#34343</td>
                       <td>Motherboard</td>
                       <td>Rp.300.000
                       </td>
