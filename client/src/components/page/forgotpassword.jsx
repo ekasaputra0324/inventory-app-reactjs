@@ -39,7 +39,6 @@ export default function Forgotpassword () {
     setEror(<div class="alert alert-danger" role="alert">        
             Your email is not registered
           </div>)
-            
    }
  
 }

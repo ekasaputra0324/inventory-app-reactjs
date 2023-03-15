@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 
-  
-
-export default class extends Component {
-  
+export default class dashboard extends Component {
   render() {
     return (
       <div>
@@ -13,15 +10,15 @@ export default class extends Component {
             <div className="container-fluid">
               <div className="row mb-2">
                 <div className="col-sm-6">
-                  <h1 className="m-0">Dashboard </h1>
+                  <h1 className="m-0">Dashboard v3</h1>
                 </div>
                 {/* /.col */}
                 <div className="col-sm-6">
                   <ol className="breadcrumb float-sm-right">
                     <li className="breadcrumb-item">
-                      <a href="#">Inventory</a>
+                      <a href="#">Home</a>
                     </li>
-                    <li className="breadcrumb-item active">Dashboard </li>
+                    <li className="breadcrumb-item active">Dashboard v3</li>
                   </ol>
                 </div>
                 {/* /.col */}

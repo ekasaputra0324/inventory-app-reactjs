@@ -5,6 +5,7 @@ export default class navbar extends Component {
   
 
   logout(){
+    console.log("oke");
     localStorage.removeItem('token')
     window.location.href = '/'
   }
@@ -28,18 +29,6 @@ export default class navbar extends Component {
         </ul>
         {/* Right navbar links */}
         <ul className="navbar-nav ml-auto">
-      
-
-          <li className="nav-item">
-            <a
-              className="nav-link"
-              data-widget="fullscreen"
-              href="#"
-              role="button"
-            >
-              <i className="fas fa-expand-arrows-alt" />
-            </a>
-          </li>
            
           <li className="nav-item">
             <a className="nav-link" data-toggle="dropdown" href="">

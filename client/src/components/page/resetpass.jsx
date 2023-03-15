@@ -74,6 +74,7 @@ export default function Resetpassword() {
                   type="password"
                   className="form-control"
                   placeholder="Password"
+                  required
                   onChange={ e => SetPassword(e.target.value)}
                 />
                 <div className="input-group-append">
@@ -85,6 +86,7 @@ export default function Resetpassword() {
               <div className="input-group mb-3">
                 <input
                   type="password"
+                  required
                   className="form-control"
                   placeholder="Confirm Password"
                   onChange={ e => SetPassword2(e.target.value)}

@@ -5,6 +5,8 @@ import LoginPage from './components/page/login';
 import useToken from './token/useToken';
 import ForgotPage from './components/index/forgot';
 import Resetpassword from './components/page/resetpass';
+import BarangPage from './components/index/barang'
+import CategoryPage from './components/index/category';
 
 function App() {
     const { token, setToken } = useToken();
@@ -27,9 +29,9 @@ function App() {
         <div>
             <Router>
                 <Switch>
-                    < Route path='/'>
-                        <Index />
-                    </Route>
+                    < Route exact path='/' render={(props) => <Index />}></Route>
+                    < Route exact path='/products' render={(props) => < BarangPage/>}></Route>
+                    < Route exact path='/category' render={(props) => < CategoryPage/>}></Route>
                 </Switch>
             </Router>
         </div>

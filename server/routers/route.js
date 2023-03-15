@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
       };
       res.status(200).json({
         LoggedIn: true,
-        name: req.body.name,
+        name: potentiallogin.rows[0].name,
         token: process.env.COOKIE_SECRET,
       });
     } else {
