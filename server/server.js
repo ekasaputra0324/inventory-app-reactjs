@@ -9,12 +9,15 @@ const server = require('http').createServer(app);
 const routeIndex = require('./routers/route');
 const path = require('path');
 const { Server } = require('socket.io');
+
+
+
+app.use(express.static(path.join(__dirname, "public")))
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
 app.set('view engine', 'ejs');
 app.set(express.static(path.join(__dirname, 'public')));
+
 
 
 const io = new Server(server, {
@@ -52,5 +55,5 @@ io.on('connect', socket => { });
 
 
 app.listen(5000, () => {
-    console.log('listening on port * 5000');
+    console.log('listening on port * 5000 ');
 });

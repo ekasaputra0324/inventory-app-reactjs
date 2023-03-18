@@ -32,9 +32,9 @@ export default function Login  ({ setToken }) {
       });
       setEror(token.LoggedIn);
       setToken(token)
+      console.log(token);
     }
-  
-   
+    
     return (
       <div>
         <div class="login-box" 

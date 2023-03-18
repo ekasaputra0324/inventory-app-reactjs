@@ -22,7 +22,7 @@ export default class navbar extends Component {
               href="#"
               role="button"
             >
-              <i className="fas fa-bars" />
+              {/* <i className="fas fa-bars" /> */}
             </a>
           </li>
           

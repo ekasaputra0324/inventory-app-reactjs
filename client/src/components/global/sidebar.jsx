@@ -16,21 +16,15 @@ export default class Sidebar extends Component {
     this.setState({ activeLink: path });
   };
 
+
+
   render() {
     const { token, activeLink } = this.state;
     return (
       <div>
         <aside className="main-sidebar sidebar-dark-primary elevation-4">
           {/* Brand Logo */}
-          <a href="/" className="brand-link">
-            <img
-              src="/dist/img/InventoryLogo.png"
-              alt="AdminLTE Logo"
-              className="brand-image img-circle elevation-3"
-              style={{ opacity: '.8' }}
-            />
-            <span className="brand-text font-weight-light">Inventory App</span>
-          </a>
+  
           {/* Sidebar */}
           <div className="sidebar">
             {/* Sidebar user (optional) */}
@@ -90,7 +84,7 @@ export default class Sidebar extends Component {
                     href="/products"
                     className={`nav-link ${
                       activeLink === '/products' ? 'active' : ''
-                    }`}
+                    } loading`}
                     onClick={() => this.setActiveLink('/products')}
                   >
                     <i className="nav-icon fas fa-th" />
@@ -123,6 +117,7 @@ export default class Sidebar extends Component {
                     </p>
                   </a>
                 </li>
+               
                 <li className="nav-item">
                   <a href="#" className="nav-link">
                     <i className="nav-icon fas fa-chart-pie" />
@@ -132,7 +127,23 @@ export default class Sidebar extends Component {
                     </p>
                   </a>
                 </li>
-               
+                <li className="nav-item">
+                  <a href="/category" 
+                  className={`nav-link ${
+                    activeLink === '/category' ? 'active' : ''
+                  }`}
+                  onClick={() => this.setActiveLink('/category')}
+                  >
+                    <i className="nav-icon fas fa-info" />
+                    <p
+                      style={{
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      app log
+                    </p>
+                  </a>
+                </li>
               </ul>
             </nav>
             {/* /.sidebar-menu */}
