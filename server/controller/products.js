@@ -1,5 +1,5 @@
 const {pool} = require('../db')
-const randomstring = require('randomstring')
+const randomstring = require('randomstring');
 
 
 const getProducts = async () => {
@@ -10,6 +10,44 @@ const getProducts = async () => {
 const getDetail = async (id) => {
     const detail = await pool.query(`SELECT * FROM products WHERE id = ${id}`)
     return detail.rows[0]
+}
+
+
+const deletdProduct = async (id) => {
+    const QueryDelete = await pool.query(`DELETE FROM products WHERE id = ${id}`)
+    if (QueryDelete.rowCount > 0) {
+        return response = {
+            status: true
+        }
+    }else{
+        return response = {
+            status: true
+        }
+    }
+}
+
+const updateProduct = async (data) => {
+    const update_at  = new Date().toISOString();
+    console.log(update_at);
+    const SQLupdate = await pool.query(`UPDATE products SET 
+                            name_product = '${data.name}', 
+                            imge = '${data.Image}',
+                            quantity = ${data.quantity}, 
+                            description = '${data.description}',
+                            update_at = '${update_at}',
+                            price = ${data.price}
+                            WHERE id = ${data.id}
+                            ` 
+                            );
+     if (SQLupdate.rowCount > 0) {
+        return response = {
+            status: true
+        }
+     }else{
+        return response = {
+            status: false
+        }
+     }
 }
 
 const insertProduct = async (name, price , quantity, image , description) => {
@@ -35,4 +73,10 @@ const insertProduct = async (name, price , quantity, image , description) => {
     }
 }
 
-module.exports = {getProducts, insertProduct, getDetail}
+module.exports = {
+                getProducts, 
+                insertProduct,
+                getDetail, 
+                deletdProduct,
+                updateProduct
+                }

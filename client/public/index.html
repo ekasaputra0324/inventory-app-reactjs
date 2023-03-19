@@ -68,6 +68,9 @@
 <!-- Page specific script -->
 <script>
   $(function () {
+    if (!localStorage.getItem('token')) {
+      
+    }else{
    const location = window.location.href;
    console.log(window.location.href);
    if (window.location.href === location) {
@@ -88,13 +91,26 @@
         clearInterval(timerInterval)
       }
     }).then((result) => {
-      /* Read more about handling dismissals below */
-      if (result.dismiss === Swal.DismissReason.timer) {
-        console.log('I was closed by the timer')
-      }
+    
     })
    }
-
+  }
+   $('.delete-product').click( async function (e) { 
+    let id = $(this).attr('data-id')
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '	#DCDCDC',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = 'http://localhost:5000/delete/'.concat(id)
+        }
+      })
+   });
   });
 
   

@@ -1,20 +1,8 @@
 import { upload } from "@testing-library/user-event/dist/upload";
-import axios from "axios";
 import React, { Component, useEffect, useState } from "react";
 import { FormatRupiah } from "@arismun/format-rupiah";
 import Pagination from "../table/pagination";
-import { Toast, Swal } from "sweetalert2";
-import { Router } from "react-router-dom";
 
-async function addProduct(data) {
-  return fetch("http://localhost:5000/product/add", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  }).then((data) => data.json());
-}
 
 export default function Barang() {
   const [dataProducts, setDataProducts] = useState([]);
@@ -23,6 +11,8 @@ export default function Barang() {
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [countData, setCountData] = useState();
+  const [id, setId] = useState("");
+  const [imageUpdate, setImageUpdate] = useState("https://fakeimg.pl/350x250")
   const [description, setDesc] = useState("");
   const [err, setErr] = useState("");
   const [created_at, setCreatedAt] = useState("");
@@ -34,10 +24,19 @@ export default function Barang() {
   const [postsPerPage] = useState(5);
 
   const handleImage = (e) => {
+    console.log(e);
     let preview = URL.createObjectURL(e);
     setImage(preview);
     setImageSave(e);
+    setImageUpdate(preview)
+    console.log(imageUpdate);
   };
+
+  const removeImage = () => {
+    setImage("https://fakeimg.pl/350x250")
+  }
+
+
 
   // add barang
   const handleSubmit = async (e) => {
@@ -54,28 +53,7 @@ export default function Barang() {
       body: formData,
     }).then((response) => response.json());
     if (req.status === true) {
-      setErr(
-        <div
-          class="alert alert-success"
-          role="alert"
-          style={{
-            width: "30%",
-            marginLeft: "70%",
-            marginBottom: "-38px",
-          }}
-        >
-          {req.message}
-          <button
-            type="button"
-            class="close"
-            data-dismiss="alert"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-      );
-      window.location.href = "/products";
+       window.location.href = 'http://localhost:3000/products'
     } else if (req.status === false) {
       setErr(
         <div
@@ -86,22 +64,42 @@ export default function Barang() {
             marginLeft: "70%",
             marginBottom: "-38px",
           }}
-        >
+          >
           {req.message}
           <button
             type="button"
             class="close"
             data-dismiss="alert"
             aria-label="Close"
-          >
+            >
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
       );
-      window.location.href = "/products";
     }
   };
 
+  // update barang 
+  const updateSubmit = async (e) => {
+    e.preventDefault();
+    var data = new FormData();
+    data.append("photo", saveImgae);
+    data.append("name", nama);
+    data.append("price", price);
+    data.append("quantity", quantity);
+    data.append("description", description);
+    data.append("id" , id);
+
+    const req = await fetch('http://localhost:5000/products/update', {
+      method: 'POST',
+      body: data
+    }).then(res => res.json())
+    if (req.status == true) {
+       window.location.href = 'http://localhost:3000/products'
+    }
+
+  }
+  
   // get detail 
   const detail = async (id) => {
   const dataDetail =  await fetch('http://localhost:5000/getDetail/'.concat(id), {
@@ -116,6 +114,7 @@ export default function Barang() {
   setDesc(dataDetail.data.description)
   setCreatedAt(dataDetail.data.created_at)
   setUpdateAt(dataDetail.data.update_at)
+  setId(dataDetail.data.id)
   }
 
   // getdata
@@ -166,8 +165,10 @@ export default function Barang() {
           <button
             className={"btn btn-primary ml-2 mb-3"}
             data-toggle="modal"
-            data-target="#modal-default"
-          >
+            data-target="#modal-lg-add"
+            onClick={removeImage}
+            >
+            
             {" "}
             Add Products
           </button>
@@ -175,7 +176,7 @@ export default function Barang() {
           <div className="card">
             {/* /.card-header */}
             <div className="card-body">
-              {err}
+            {err}
               <input
                 type="text"
                 className="form-control mb-4"
@@ -200,7 +201,13 @@ export default function Barang() {
                 </thead>
                 <tbody>
                   {dataProducts.length < 1
-                    ? ""
+                    ? <tr>
+                      <td></td>
+                      <td></td>
+                      <td>Data not found</td>
+                      <td></td>
+                      <td></td>
+                    </tr>
                     : currentPosts
                         .filter((product) =>
                           product.name_product.toLowerCase().includes(query)
@@ -223,12 +230,6 @@ export default function Barang() {
                                 >
                                   <i className="nav-icon fas fa-eye" />
                                 </button>
-                                <button className="btn btn-outline-info ">
-                                  <i className="nav-icon fas fa-edit" />
-                                </button>
-                                <button className="btn btn-outline-danger ml-2">
-                                  <i className="nav-icon fas fa-trash" />
-                                </button>
                               </td>
                             </tr>
                           );
@@ -250,110 +251,84 @@ export default function Barang() {
         </section>
         {/* /.content */}
       </div>
-      {/* modal add*/}
-      <div className="modal fade" id="modal-default">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">Add Product</h4>
-              <button
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div className="modal-body">
+  
+
+      {/* modal add */}
+      <div className="modal fade" id="modal-lg-add">
+      <div className="modal-dialog modal-lg">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h4 className="modal-title">Add Product</h4>
+            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div className="modal-body">
+            
+            <img src={image} style={{ 
+              height: "300px",
+              width: "350px",
+              marginBottom: "-42%",
+              marginLeft: "10%"
+             }}></img>
               <form onSubmit={handleSubmit}>
-                <div>
-                  <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">Name</label>
-                    <input
+
+          <ul class="list-group mb-3" style={{ 
+            width: '38%',
+            marginLeft: '60%',
+          }}>
+             <input
                       type="text"
-                      className="form-control"
+                      className="form-control mb-3"
                       id="name"
                       required
                       placeholder="Enter Name"
                       onChange={(e) => setNama(e.target.value)}
                     />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="Price">Price</label>
-                    <input
+             <input
                       type="text"
-                      className="form-control"
+                      className="form-control mb-3"
                       id="Price"
                       required
                       placeholder="Price"
                       onChange={(e) => setPrice(e.target.value)}
                     />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="quantity">Quantity</label>
                     <input
-                      type="text"
-                      className="form-control"
-                      id="quantity"
-                      required
-                      placeholder="Quantity"
-                      onChange={(e) => setQuantity(e.target.value)}
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <div>
-                      <img
-                        style={{
-                          height: "250px",
-                          width: "350px",
-                        }}
-                        src={image}
-                      ></img>
-                    </div>
-                  </div>
-                  <div class="mb-3">
-                    <div>
-                      <input
-                        className="form-control"
+               
+                    className="form-control mb-3"
+                    required
+                    placeholder="Quantity"
+                    type="text"
+                    id="quantity"
+                    onChange={(e) => setQuantity(e.target.value)}
+                />
+               <input
+               
+                        className="form-control mb-3"
                         required
                         type="file"
                         id="formFile"
                         onChange={(e) => handleImage(e.target.files[0])}
-                      />
-                    </div>
-                  </div>
-                  <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">
-                      Deskription
-                    </label>
-                    <textarea
-                      class="form-control"
+                />
+           <textarea
+                      class="form-control mb-3"
                       id="exampleFormControlTextarea1"
                       rows="3"
                       onChange={(e) => setDesc(e.target.value)}
-                    ></textarea>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-default"
-                      data-dismiss="modal"
-                    >
-                      Close
-                    </button>
-                    <button type="submit" className="btn btn-primary save">
-                      Save
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
+            ></textarea>
+        </ul>
+          <div className="modal-footer justify-content">
+            <button type="submit" className="btn btn-primary" >
+              Save
+          </button>
           </div>
-          {/* /.modal-content */}
+        </form>
+          </div>
         </div>
-        {/* /.modal-dialog */}
+        {/* /.modal-content */}
       </div>
+      {/* /.modal-dialog */}
+    </div>
       {/* end modal add */}
 
       {/* modal detail */}
@@ -368,9 +343,9 @@ export default function Barang() {
           </div>
           <div className="modal-body">
             <img src={image} style={{ 
-              height: "275px",
+              height: "300px",
               width: "350px",
-              marginBottom: "-37%",
+              marginBottom: "-35%",
               marginLeft: "10%"
              }}></img>
           <ul class="list-group mb-3" style={{ 
@@ -381,19 +356,63 @@ export default function Barang() {
             <li class="list-group-item">Quantity : {quantity} </li>
             <li class="list-group-item">Deskription : {description}</li>
             <li class="list-group-item">Created at : <span style={{ fontSize: "15px" }}>{created_at}</span> </li>
-            <li class="list-group-item">Update at : {update_at}</li>
+            <li class="list-group-item">Update at : <span style={{ fontSize: "15px" }}>{update_at}</span></li>
         </ul>
           </div>
           <div className="modal-footer justify-content">
-            <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" className="btn btn-outline-danger delete-product" data-id={id}>Delete</button>
+            <button type="button" className="btn btn-outline-info" 
+                                   data-toggle="modal" data-target="#modal-lg-update"
+                                   onClick={() => detail(id)}>Update
+          </button>
           </div>
         </div>
         {/* /.modal-content */}
       </div>
       {/* /.modal-dialog */}
     </div>
-
       {/* end modal detail */}
+      {/* modal update */}
+         <div className="modal fade" id="modal-lg-update">
+      <div className="modal-dialog modal-lg">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h4 className="modal-title">Update Product</h4>
+            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div className="modal-body">
+            <img src={imageUpdate} style={{ 
+              height: "280px",
+              width: "350px",
+              marginBottom: "-33%",
+              marginLeft: "10%"
+             }} ></img>
+            <form  onSubmit={updateSubmit}>
+          <ul class="list-group mb-3" style={{ 
+            width: '38%',
+            marginLeft: '60%',
+          }}>
+            <input type="hidden" value={id}/>
+            <input type="text" class="form-control mb-2" placeholder={nama}  onChange={e => setNama(e.target.value)}/>
+            <input type="text" class="form-control mb-2" placeholder={price}  onChange={e => setPrice(e.target.value)} />
+            <input type="text" class="form-control mb-2" placeholder={quantity} onChange={e => setQuantity(e.target.value)}  />
+            <input type="file" class="form-control mb-2" onChange={e => handleImage(e.target.files[0])}  />
+            <input type="text" class="form-control mb-2" placeholder="Description" onChange={e => e.target.value}/>
+        </ul>
+          <div className="modal-footer justify-content">
+            <button type="button" className="btn btn-outline-warning" data-dismiss="modal">Close</button>
+             <button type="submit" className="btn btn-outline-primary">Save Change</button>
+          </div>
+          </form>
+          </div>
+        </div>
+        {/* /.modal-content */}
+      </div>
+      {/* /.modal-dialog */}
+      </div>
+      {/* modal end update */}
     </div>
   );
 }

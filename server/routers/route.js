@@ -4,7 +4,8 @@ require("dotenv").config();
 const authenticate = require('../controller/authenticate')
 const multer = require('multer');
 const path = require("path");
-const products = require('../controller/products')
+const products = require('../controller/products');
+const { log } = require("console");
 
 router.post("/login", async (req, res) => {
 
@@ -117,7 +118,53 @@ router.get('/getDetail/:id', async (req, res) => {
 });
 
 
-router.get('/product/data',async (req, res) => {
+router.get('/delete/:id' , async (req, res) => {
+  const id = req.params.id;
+  const deleted = await products.deletdProduct(id)
+  if (deleted.status === true) {
+      res.redirect('http://localhost:3000/products') 
+  }else{
+    res.status(500).json({
+      status: false,
+      message: 'Product deleted failed'
+    });
+  }
+});
+
+
+router.post('/products/update',upload.single('photo'),async (req, res) => {
+  const { name , price ,quantity, description, id} = req.body; 
+  const Image = '';
+  const data = {
+    name ,
+    price,
+    quantity,
+    description,
+    id,
+    Image
+  }
+  if (typeof req.file === 'undefined') {
+      const detail = await products.getDetail(id);
+      data.Image = detail.imge;
+    }else{
+      data.Image = req.protocol + '://' + req.get('host') + "/products/"+ req.file.filename 
+    }  
+    console.log(data.Image);
+    const updateAPI = await products.updateProduct(data)
+    if (updateAPI.status === true) {
+       response = {
+        status: true
+      }
+      res.send(response)
+    }else{
+      response = {
+        status: false
+      }
+      res.send(response)
+    }
+})
+
+router.get('/product/data',upload.single('photo'),async (req, res) => {
   const data = await products.getProducts();
   res.status(200).json({
     data: data
