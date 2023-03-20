@@ -143,6 +143,7 @@ router.post('/products/update',upload.single('photo'),async (req, res) => {
     id,
     Image
   }
+  console.log(data);
   if (typeof req.file === 'undefined') {
       const detail = await products.getDetail(id);
       data.Image = detail.imge;
@@ -158,7 +159,8 @@ router.post('/products/update',upload.single('photo'),async (req, res) => {
       res.send(response)
     }else{
       response = {
-        status: false
+        status: false,
+        message: 'Update Failed'
       }
       res.send(response)
     }

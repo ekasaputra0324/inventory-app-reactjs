@@ -66,54 +66,6 @@
 <script src="%PUBLIC_URL%/dist/js/demo.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Page specific script -->
-<script>
-  $(function () {
-    if (!localStorage.getItem('token')) {
-      
-    }else{
-   const location = window.location.href;
-   console.log(window.location.href);
-   if (window.location.href === location) {
-    let timerInterval
-    Swal.fire({
-      title: 'Loading..',
-      html: 'Fetching data <b></b>',
-      timer: 1500,
-      timerProgressBar: true,
-      didOpen: () => {
-        Swal.showLoading()
-        const b = Swal.getHtmlContainer().querySelector('b')
-        timerInterval = setInterval(() => {
-          b.textContent = Swal.getTimerLeft()
-        }, 100)
-      },
-      willClose: () => {
-        clearInterval(timerInterval)
-      }
-    }).then((result) => {
-    
-    })
-   }
-  }
-   $('.delete-product').click( async function (e) { 
-    let id = $(this).attr('data-id')
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '	#DCDCDC',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = 'http://localhost:5000/delete/'.concat(id)
-        }
-      })
-   });
-  });
-
-  
-</script>
+<script src="%PUBLIC_URL%/dist/js/app.js" ></script>
 </body>
 </html>

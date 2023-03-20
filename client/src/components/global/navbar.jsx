@@ -4,11 +4,6 @@ import React, { Component } from 'react'
 export default class navbar extends Component {
   
 
-  logout(){
-    console.log("oke");
-    localStorage.removeItem('token')
-    window.location.href = '/'
-  }
 
   render() {
     return (
@@ -32,7 +27,7 @@ export default class navbar extends Component {
            
           <li className="nav-item">
             <a className="nav-link" data-toggle="dropdown" href="">
-            <i className="fas fa-sign-out-alt"  onClick={this.logout}></i>
+            <i className="fas fa-sign-out-alt logout"></i>
             </a>
           </li>
         </ul>

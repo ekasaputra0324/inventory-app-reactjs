@@ -92,14 +92,18 @@ export default class Sidebar extends Component {
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a href="#" className="nav-link">
+                  <a
+                    href="/transaction"
+                    className={`nav-link ${
+                      activeLink === '/transaction' ? 'active' : ''
+                    } loading`}
+                    onClick={() => this.setActiveLink('/transaction')}
+                  >
                     <i className="nav-icon fas fa-file-invoice" />
-                    <p>
-                      Transaction
-                      {/* <i className="right fas fa-angle-left" /> */}
-                    </p>
+                    <p>Transactions</p>
                   </a>
                 </li>
+               
                 <li className="nav-item">
                   <a href="/category" 
                   className={`nav-link ${
@@ -128,11 +132,11 @@ export default class Sidebar extends Component {
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a href="/category" 
+                  <a href="/app-log" 
                   className={`nav-link ${
-                    activeLink === '/category' ? 'active' : ''
+                    activeLink === '/app-log' ? 'active' : ''
                   }`}
-                  onClick={() => this.setActiveLink('/category')}
+                  onClick={() => this.setActiveLink('/app-log')}
                   >
                     <i className="nav-icon fas fa-info" />
                     <p

@@ -3,7 +3,7 @@ const randomstring = require('randomstring');
 
 
 const getProducts = async () => {
-    const data = await pool.query(`SELECT * FROM products`)
+    const data = await pool.query(`SELECT * FROM products ORDER BY created_at DESC`)
     return data.rows
 };
 
@@ -28,7 +28,6 @@ const deletdProduct = async (id) => {
 
 const updateProduct = async (data) => {
     const update_at  = new Date().toISOString();
-    console.log(update_at);
     const SQLupdate = await pool.query(`UPDATE products SET 
                             name_product = '${data.name}', 
                             imge = '${data.Image}',

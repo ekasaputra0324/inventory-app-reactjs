@@ -7,6 +7,8 @@ import ForgotPage from './components/index/forgot';
 import Resetpassword from './components/page/resetpass';
 import BarangPage from './components/index/barang'
 import CategoryPage from './components/index/category';
+import Transaction from './components/index/transaction';
+
 
 function App() {
     const { token, setToken } = useToken();
@@ -31,6 +33,7 @@ function App() {
                 <Switch>
                     < Route exact path='/' render={(props) => <Index />}></Route>
                     < Route exact path='/products' render={(props) => < BarangPage/>}></Route>
+                    < Route exact path='/transaction' render={(props) => < Transaction/>}></Route>
                     < Route exact path='/category' render={(props) => < CategoryPage/>}></Route>
                 </Switch>
             </Router>
