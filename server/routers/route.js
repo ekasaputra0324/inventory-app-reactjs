@@ -37,7 +37,7 @@ router.post("/reset_password", async (req, res) => {
   if (sendEmail.status == true) {
     res.status(200).json({
       status: sendEmail.status,
-      message: sendEmail.detail,
+      message: sendEmail.detail, 
     });
     // jika pengiriman email gagal
   } else if (sendEmail.status === false) {
@@ -86,7 +86,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({storage})
+const upload = multer({storage})  
 
 router.post('/product/add', upload.single('photo'), async(req , res ) => {
   const {name , price, quantity, description, categori} = req.body
@@ -242,8 +242,9 @@ router.post('/transaction/update', async (req, res) => {
     quantity: quantity,
     custumer: custumer,
     transaction_id: transaction_id 
-  }
+  }  
  const update = await transaction.update(data);
+ res.send(update);
 });
 
 // filtering kategori 

@@ -3,12 +3,15 @@ import React, { Component, useEffect, useState } from "react";
 import { FormatRupiah } from "@arismun/format-rupiah";
 import Pagination from "../table/pagination";
 
+
+
 export default function Barang() {
   const [dataProducts, setDataProducts] = useState([]);
   const [nama, setNama] = useState("");
   const [query, SetQuery] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [categori, setCategori] = useState("");
   const [countData, setCountData] = useState();
   const [id, setId] = useState("");
   const [imageUpdate, setImageUpdate] = useState("http://localhost:5000/products/png-1679294291272.png");
@@ -20,7 +23,7 @@ export default function Barang() {
   const [saveImgae, setImageSave] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage] = useState(5);
+  const [postsPerPage] = useState(7);
 
   const handleImage = (e) => {
     console.log(e);
@@ -46,7 +49,7 @@ export default function Barang() {
     formData.append("price", price);
     formData.append("quantity", quantity);
     formData.append("description", description);
-
+    formData.append("categori", categori);
 
     const req = await fetch("http://localhost:5000/product/add", {
       method: "POST",
@@ -56,10 +59,10 @@ export default function Barang() {
 
       let response = {
         status : true,
-        message: 'inserted successfully , please wait load your page..'
+        message: 'product successfully add...'
       }
 
-      localStorage.setItem('product',JSON.stringify(response))
+      localStorage.setItem('err',JSON.stringify(response))
       window.location.href = "http://localhost:3000/products";
       
     } else if (req.status === false) {
@@ -77,6 +80,7 @@ export default function Barang() {
     data.append("quantity", quantity);
     data.append("description", description);
     data.append("id", id);
+    data.append('categori', categori)
 
     const req = await fetch("http://localhost:5000/products/update", {
       method: "POST",
@@ -85,9 +89,9 @@ export default function Barang() {
     if (req.status == true) {
       let response = {
         status : true,
-        message: 'update successfully , please wait load your page..'
+        message: 'product successfully updated...'
       }
-      localStorage.setItem('product',JSON.stringify(response))
+      localStorage.setItem('err',JSON.stringify(response))
       window.location.href = "http://localhost:3000/products";
       window.location.href = "http://localhost:3000/products";
     } else {
@@ -104,6 +108,7 @@ export default function Barang() {
       }
     ).then((data) => data.json());
 
+    setCategori(dataDetail.data.category);
     setNama(dataDetail.data.name_product);
     setPrice(dataDetail.data.price);
     setQuantity(dataDetail.data.quantity);
@@ -113,6 +118,15 @@ export default function Barang() {
     setUpdateAt(dataDetail.data.update_at);
     setId(dataDetail.data.id);
   };
+
+  const filterCategory = async (e) => {
+    fetch('http://localhost:5000/products/category/'+e, {
+      method: 'GET'
+    }).then(res => res.json())
+      .then(data => {
+        setDataProducts(data)
+      })
+  }
 
   // getdata
   useEffect(() => {
@@ -180,6 +194,18 @@ export default function Barang() {
                 aria-describedby="basic-addon1"
                 style={{ width: "20%" }}
               />
+               <select class="form-select  mb-4" aria-label="Default select example" id="select" onChange={e => filterCategory(e.target.value)}
+                style={{ 
+                  width: '20%',
+                  marginLeft: '22%',
+                  marginTop:'-62px'
+                  }}
+              >
+               <option value="" selected  id="option"> Select categori </option>  
+               <option value="all">All</option>  
+               <option value="sofware">Sofware</option>  
+               <option value="hardware">Hardware</option>  
+              </select>
               <table id="" className="table table-bordered table-striped mb-3">
                 <thead>
                   <tr
@@ -191,7 +217,7 @@ export default function Barang() {
                     <th>Name</th>
                     <th>Quantity</th>
                     <th>Price</th>
-                    <th></th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -213,6 +239,7 @@ export default function Barang() {
                           <tr
                             style={{
                               textAlign: "center",
+                              textTransform: 'capitalize'
                             }}
                           >
                             <td>#{product.item_code}</td>
@@ -221,7 +248,7 @@ export default function Barang() {
                             <td>{<FormatRupiah value={product.price} />}</td>
                             <td>
                               <button
-                                className="btn btn-outline-primary mr-2"
+                                className="btn btn-info mr-2"
                                 data-toggle="modal"
                                 data-target="#modal-lg"
                                 onClick={() => detail(product.id)}
@@ -272,7 +299,7 @@ export default function Barang() {
                 style={{
                   height: "300px",
                   width: "350px",
-                  marginBottom: "-42%",
+                  marginBottom: "-48%",
                   marginLeft: "10%",
                 }}
               ></img>
@@ -292,6 +319,11 @@ export default function Barang() {
                     placeholder="Enter Name"
                     onChange={(e) => setNama(e.target.value)}
                   />
+                    <select class="form-select  mb-4" aria-label="Default select example" onChange={e => setCategori(e.target.value)}>
+                    <option value="" selected> Select categori </option>  
+                    <option value="sofware">Sofware</option>  
+                    <option value="hardware">Hardware</option>  
+                    </select>
                   <input
                     type="text"
                     className="form-control mb-3"
@@ -357,7 +389,7 @@ export default function Barang() {
                 style={{
                   height: "300px",
                   width: "350px",
-                  marginBottom: "-35%",
+                  marginBottom: "-40%",
                   marginLeft: "10%",
                 }}
               ></img>
@@ -368,6 +400,9 @@ export default function Barang() {
                   marginLeft: "60%",
                 }}
               >
+                <li class="list-group-item">
+                  Categori : {categori}
+                </li>
                 <li class="list-group-item">
                   Price : {<FormatRupiah value={price} />}
                 </li>
@@ -428,7 +463,7 @@ export default function Barang() {
                 style={{
                   height: "280px",
                   width: "350px",
-                  marginBottom: "-38%",
+                  marginBottom: "-43%",
                   marginLeft: "10%",
                 }}
               ></img>
@@ -447,6 +482,13 @@ export default function Barang() {
                     placeholder={nama}
                     onChange={(e) => setNama(e.target.value)}
                   />
+              <select class="form-select  mb-2" aria-label="Default select example" id="select" onChange={e => setCategori(e.target.value)}>
+                {categori === 'sofware' ? 
+                <><option value="sofware" selected>Sofware</option><option value="hardware">Hardware</option></>  
+                :
+                <><option value="hardware" selected>Hardware</option><option value="sofware">Sofware</option></>  
+               }
+              </select>
                   <input
                     type="text"
                     class="form-control mb-2"
@@ -477,6 +519,9 @@ export default function Barang() {
                     type="button"
                     className="btn btn-warning"
                     data-dismiss="modal"
+                    style={{ 
+                      color: 'white'
+                     }}
                   >
                     Close
                   </button>

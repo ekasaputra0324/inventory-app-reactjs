@@ -5,14 +5,14 @@ $(function () {
         const location = window.location.href;
         console.log(window.location.href);
         if (window.location.href === location) {
-            let err = JSON.parse(localStorage.getItem('product'));
+            let err = JSON.parse(localStorage.getItem('err'));
             let message = 'please wait for the page to load..'
             if (err === null) {
                 let timerInterval
                 Swal.fire({
                     title: 'Loading..',
                     html: message,
-                    timer: 1500,
+                    timer: 2000,
                     timerProgressBar: true,
                     didOpen: () => {
                         Swal.showLoading()
@@ -25,14 +25,14 @@ $(function () {
                         clearInterval(timerInterval)
                     }
                 }).then((result) => {
-                    localStorage.removeItem('product')
+                    localStorage.removeItem('err')
                 })
             } else {
                 let timerInterval
                 Swal.fire({
                     title: 'Loading..',
                     html: err.message,
-                    timer: 1600,
+                    timer: 1800,
                     timerProgressBar: true,
                     didOpen: () => {
                         Swal.showLoading()
@@ -45,7 +45,7 @@ $(function () {
                         clearInterval(timerInterval)
                     }
                 }).then((result) => {
-                    localStorage.removeItem('product')
+                    localStorage.removeItem('err')
                 })
             }
         }
@@ -61,7 +61,7 @@ $(function () {
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
-            cancelButtonColor: '#DCDCDC',
+            // cancelButtonColor: '#DCDCDC',
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -80,9 +80,8 @@ $(function () {
             title: 'Are you sure?',
             text: "if you logout the application session will end!",
             icon: 'warning',
-            // showCancelButton: true,
             confirmButtonColor: '#d33',
-            cancelButtonColor: '#d33',
+            // cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, logout it!'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -92,4 +91,13 @@ $(function () {
         })
         
     });
+    $('#select').click(function (e) { 
+        $('#option').hide();
+    });
+   $('#export-excel-transaction').click(function (e) { 
+    e.preventDefault();
+    $("#transaction").table2csv({
+        filename: 'transaction.csv'
+    })
+   });
 });

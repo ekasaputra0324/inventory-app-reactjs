@@ -1,4 +1,190 @@
-export default function transaction() {
+import { FormatRupiah } from "@arismun/format-rupiah";
+import React, { useEffect, useState } from "react";
+import Pagination from "../table/pagination";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+async function APIadd(data) {
+  return fetch("http://localhost:5000/transaction/add", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  }).then((data) => data.json());
+}
+
+export default function Transaction() {
+  const [data, setData] = useState([]);
+  const [err, setErr] = useState(true);
+  const [dataProduct, setDataProduct] = useState([]);
+  const [selectOption, setSelectOption] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [custumer, setCustumer] = useState("");
+  const [ProductId, setProductId] = useState("");
+  const [idP, setIdP ] = useState("");
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(5);
+  const MySwal = withReactContent(Swal);
+  const [id, setId] = useState();
+
+
+  // GET DATA TRANSACTION
+  useEffect(() => {
+    fetch("http://localhost:5000/transactions", {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+      });
+  }, []);
+  // GET DATA PRODUCTS
+  useEffect(() => {
+    fetch("http://localhost:5000/product/data", {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setDataProduct(data.data);
+      });
+  }, []);
+
+  
+  // add data
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const add = await APIadd({
+      selectOption,
+      custumer,
+      quantity,
+    });
+
+    if (add.status === true) {
+      let reaponse = {
+        status: true,
+        message: add.message,
+      };
+      window.location.href = "/transaction";
+      localStorage.setItem("err", JSON.stringify(reaponse));
+    } else {
+      let reaponse = {
+        status: false,
+        message: add.message,
+      };
+      setErr(reaponse.status);
+    }
+  };
+  //hnadel update  
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    
+    const data = {
+      product_id: selectOption,
+      quantity:  quantity,
+      custumer:   custumer,
+      transaction_id:  id
+      }
+    
+    if (!selectOption) {
+      data.product_id = idP.id
+    }
+
+    await fetch('http://localhost:5000/transaction/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then(res => res.json())
+      .then(data => {
+        if (data.status === true) {
+          let reaponse = {
+            status: true,
+            message: data.message,
+          };
+          window.location.href = "/transaction";
+          localStorage.setItem("err", JSON.stringify(reaponse));
+        } else {
+          let reaponse = {
+            status: false,
+            message: data.message,
+          };
+          setErr(reaponse.status);
+        }
+      })     
+  }
+  // handle delete
+  const deleted = async (id) => {
+    console.log(id);
+    MySwal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("http://localhost:5000/delete/transaction/".concat(id), {
+          method: "DELETE",
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            if (result.status === true) {
+              window.location.reload();
+            }
+          });
+      }
+    });
+  };
+  // hide select
+  const hideSelect = (product_id) => {
+    fetch("http://localhost:5000/products/hide/".concat(product_id), {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setDataProduct(data);
+      });
+  };
+  // get detail
+  const detail = async (id) => {
+    fetch("http://localhost:5000/transactions/".concat(id), {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setCustumer(data.detailTran.custumer);
+        setQuantity(data.detailTran.quantity);
+        setProductId(data.detailProduct);
+        setIdP(data.detailProduct);
+        setId(data.detailTran.id);
+      });
+  };
+
+  // filtering categori
+  const CatgeoriFiltering = async (e) => {
+    fetch("http://localhost:5000/transaction/".concat(e), {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+      });
+  };
+
+  // Get current posts
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  let currentPosts = data.slice(indexOfFirstPost, indexOfLastPost);
+
+  // change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div>
       {/* Content Header (Page header) */}
@@ -25,54 +211,69 @@ export default function transaction() {
         {/* Main content */}
         <section className="content mb-4">
           <button
-            className={"btn btn-primary ml-2 mb-4"}
+            className={"btn btn-primary  mb-4"}
             data-toggle="modal"
             data-target="#modal-default"
           >
             {" "}
             Add Transaction
           </button>
+
           {/* Default box */}
-         
+
           <div className="card">
             {/* /.card-header */}
             <div className="card-body">
-                <div style={{ paddingBottom: '-39%' , marginBottom: '-2%'}}>
-              <input
-                type="text"
-                className="form-control mb-4"
-                placeholder="Search..."
-                aria-describedby="basic-addon1"
-                style={{ width: "20%" }}
-              />
-              
-             <input type="date" class="form-control mb-4" 
-             placeholder="Quantity" aria-describedby="emailHelp"
-             style={{ 
-                width: '20%',
-                marginLeft: '22%',
-                marginTop:'-63px'
-                }}
-             />
-             <button className="btn btn-success mb-4"
-             style={{ 
-                // width: '20%',
-                marginLeft: '43%',
-                marginTop:'-90px'
-                }}
-             >
-             Export Excel <span className="ml-1"><i class="fas fa-file-excel"></i></span>
-             </button>
-             </div>
-              <table id="" className="table table-bordered table-striped mb-4"
-              
-              >
+              <div style={{ paddingBottom: "-39%", marginBottom: "-2%" }}>
+                <input
+                  type="date"
+                  className="form-control mb-4"
+                  placeholder="YYY/MM/DD"
+                  onChange={(e) => setSearch(e.target.value)}
+                  aria-describedby="basic-addon1"
+                  style={{ width: "20%" }}
+                />
+
+                <select
+                  class="form-select  mb-4"
+                  id="select"
+                  aria-label="Default select example"
+                  onChange={(e) => CatgeoriFiltering(e.target.value)}
+                  style={{
+                    width: "20%",
+                    marginLeft: "22%",
+                    marginTop: "-62px",
+                  }}
+                >
+                  <option value="" selected id="option">
+                    {" "}
+                    Select categori{" "}
+                  </option>
+                  <option value="all">All</option>
+                  <option value="sofware">Sofware</option>
+                  <option value="hardware">Hardware</option>
+                </select>
+                <button
+                  className={"btn btn-success  mb-4"}
+                  id="export-excel-transaction"
+                  style={{
+                    // width: '20%',
+                    marginLeft: "43%",
+                    marginTop: "-90px",
+                  }}
+                >
+                  {" "}
+                  Export Excel
+                </button>
+              </div>
+              <table id="transaction" className="table table-bordered table-striped mb-4">
                 <thead>
                   <tr
                     style={{
-                      textAlign: "center",  
+                      textAlign: "center",
                     }}
                   >
+                    <th>Transaction code</th>
                     <th>Custumer</th>
                     <th>Product</th>
                     <th>Quantity</th>
@@ -83,22 +284,74 @@ export default function transaction() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                  style={{ 
-                    textAlign: 'center',
-                   }}
-                  >
-                    <td></td>
-                    <td></td>
-                    <td>Data not found</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
+                  {currentPosts.length < 1 ? (
+                    <tr
+                      style={{
+                        textAlign: "center",
+                        textTransform: 'capitalize'
+                      }}
+                    >
+                      <td></td>
+                      <td></td>
+                      <td>Data not found</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  ) : (
+                    currentPosts
+                      .filter((transaction) =>
+                        transaction.created_at.includes(search)
+                      )
+                      .map((transaction) => {
+                        return (
+                          <tr
+                            style={{
+                              textAlign: "center",
+                              textTransform: 'capitalize'
+                            }}
+                          >
+                            <td>#{transaction.transaction_code}</td>
+                            <td>{transaction.custumer}</td>
+                            <td>{transaction.product}</td>
+                            <td>{transaction.quantity}</td>
+                            <td>
+                              {<FormatRupiah value={transaction.price} />}
+                            </td>
+                            <td>
+                              {<FormatRupiah value={transaction.total} />}
+                            </td>
+                            <td>{transaction.created_at}</td>
+                            <td>
+                              <button
+                                className="btn btn-danger mr-2"
+                                onClick={() => deleted(transaction.id)}
+                              >
+                                <i class="fa fa-trash " aria-hidden="true"></i>
+                              </button>
+                              <button
+                                className="btn btn-info"
+                                data-toggle="modal"
+                                data-target="#modal-update"
+                                onClick={() => detail(transaction.id)}
+                              >
+                                <i class="fa fa-edit " aria-hidden="true"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                  )}
                 </tbody>
               </table>
               {/* pagination */}
+              <Pagination
+                postsPerPage={postsPerPage}
+                totalPosts={data.length}
+                paginate={paginate}
+              />
             </div>
 
             {/* /.card-body */}
@@ -123,42 +376,170 @@ export default function transaction() {
                 <span aria-hidden="true">×</span>
               </button>
             </div>
-            <div className="modal-body">
-        <div class="mb-3">
-        <label className="form-label mb-2">Products</label>
-        <select class="form-select" aria-label="Default select example">
-            <option selected></option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-        </select>
-        </div>
-        <div class="mb-3">
-        <label class="form-label">Quantity</label>
-        <input type="email" class="form-control" placeholder="Quantity" aria-describedby="emailHelp"/>
-        </div>
-        <div class="mb-3">
-        <label  class="form-label">Custumer</label>
-        <input type="email" class="form-control" placeholder="Name Custumer" aria-describedby="emailHelp"/>
-        </div>
-            </div>
-            <div className="modal-footer justify-content-between">
-              <button
-                type="button"
-                className="btn btn-default"
-                data-dismiss="modal"
+            {err ? (
+              ""
+            ) : (
+              <div
+                class="alert alert-danger  mt-3"
+                role="alert"
+                style={{
+                  width: "85%",
+                  marginLeft: "35px",
+                  textAlign: "center",
+                }}
               >
-                Close
-              </button>
-              <button type="submit" className="btn btn-primary">
-                Save
-              </button>
-            </div>
+                the number of items that you enter is more than the number of
+                items that exist!!
+              </div>
+            )}
+            <form onSubmit={handleSubmit}>
+              <div className="modal-body">
+                <div class="mb-3">
+                  <label className="form-label mb-2">Products</label>
+                  <select
+                    class="form-select"
+                    aria-label="Default select example"
+                    onChange={(e) => setSelectOption(e.target.value)}
+                  >
+                    <option selected value={""}>
+                      Select product
+                    </option>
+                    {dataProduct.map((product) => (
+                      <option value={product.id}>
+                        {product.name_product} ({product.quantity})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Quantity</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Quantity"
+                    aria-describedby="qunatity"
+                    onChange={(e) => setQuantity(e.target.value)}
+                  />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Custumer</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Name Custumer"
+                    aria-describedby="custumer"
+                    onChange={(e) => setCustumer(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer justify-content-between">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Save
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
+      {/* end modal add */}
 
-      {/* end modal */}
+      {/* modal update */}
+      <div className="modal fade" id="modal-update">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">Update Transaction</h4>
+              <button
+                type="button"
+                className="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            {err ? (
+              ""
+            ) : (
+              <div
+                class="alert alert-danger  mt-3"
+                role="alert"
+                style={{
+                  width: "85%",
+                  marginLeft: "35px",
+                  textAlign: "center",
+                }}
+              >
+                the number of items that you enter is more than the number of
+                items that exist!!
+              </div>
+            )}
+            <form onSubmit={handleUpdate}>
+              <input type="hidden" value={id} onChange={e => setId(e.target.value)} />
+              <div className="modal-body">
+                <div class="mb-3">
+                  <label className="form-label mb-2">Products</label>
+                  <select
+                    class="form-select"
+                    aria-label="Default select example"
+                    onChange={(e) => setSelectOption(e.target.value)}
+                    onClick={() => hideSelect(ProductId.id)}
+                  >
+                    <option value={ProductId.id} selected>
+                      {ProductId.name_product}({ProductId.quantity})
+                    </option>
+                    {dataProduct.map((product) => (
+                      <option value={product.id}>
+                        {product.name_product} ({product.quantity})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Quantity</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    aria-describedby="qunatity"
+                    placeholder={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                  />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Custumer</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    aria-describedby="custumer"
+                    placeholder={custumer}
+                    onChange={(e) => setCustumer(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer justify-content-between">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {/* end modal update */}
     </div>
   );
 }

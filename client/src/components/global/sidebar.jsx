@@ -104,23 +104,6 @@ export default class Sidebar extends Component {
                   </a>
                 </li>
                
-                <li className="nav-item">
-                  <a href="/category" 
-                  className={`nav-link ${
-                    activeLink === '/category' ? 'active' : ''
-                  }`}
-                  onClick={() => this.setActiveLink('/category')}
-                  >
-                    <i className="nav-icon fas fa-edit" />
-                    <p
-                      style={{
-                        textTransform: 'capitalize',
-                      }}
-                    >
-                      category
-                    </p>
-                  </a>
-                </li>
                
                 <li className="nav-item">
                   <a href="#" className="nav-link">
