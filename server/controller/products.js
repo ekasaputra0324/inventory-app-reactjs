@@ -7,9 +7,20 @@ const getProducts = async () => {
     return data.rows
 };
 
+
 const getDetail = async (id) => {
     const detail = await pool.query(`SELECT * FROM products WHERE id = ${id}`)
     return detail.rows[0]
+}
+
+const filterData = async (categori) => {
+    const selectSQL = await pool.query(`SELECT * FROM products WHERE category = '${categori}'`);
+    return selectSQL.rows
+}
+
+const filterDataByid = async (id) => {
+    const selectSQL = await pool.query(`SELECT * FROM products WHERE id != ${id}`)
+    return selectSQL.rows
 }
 
 
@@ -26,6 +37,11 @@ const deletdProduct = async (id) => {
     }
 }
 
+const getDetailName = async (name) => {
+    const getDetail = await pool.query(`SELECT * FROM products WHERE name_product = '${name}'`);
+    return getDetail.rows[0]
+}
+
 const updateProduct = async (data) => {
     const update_at  = new Date().toISOString();
     const SQLupdate = await pool.query(`UPDATE products SET 
@@ -34,10 +50,9 @@ const updateProduct = async (data) => {
                             quantity = ${data.quantity}, 
                             description = '${data.description}',
                             update_at = '${update_at}',
-                            price = ${data.price}
-                            WHERE id = ${data.id}
-                            ` 
-                            );
+                            price = ${data.price}, 
+                            category = '${data.categori}'
+                            WHERE id = ${data.id}`);
      if (SQLupdate.rowCount > 0) {
         return response = {
             status: true
@@ -49,13 +64,13 @@ const updateProduct = async (data) => {
      }
 }
 
-const insertProduct = async (name, price , quantity, image , description) => {
+const insertProduct = async (name, price , quantity, image , description, category) => {
 
     let response 
     const item_code = Math.floor(Math.random() * 600000);
     const created_at = new Date().toISOString();
-    const insetSQL = await pool.query(`INSERT INTO products (item_code, name_product, price, quantity, imge, description, created_at)
-                                     VALUES (${item_code}, '${name}',${price},'${quantity}', '${image}', '${description}', '${created_at}')
+    const insetSQL = await pool.query(`INSERT INTO products (item_code, name_product, price, quantity, imge, description, created_at, category)
+                                     VALUES (${item_code}, '${name}',${price},'${quantity}', '${image}', '${description}', '${created_at}', '${category}')
                                      `)
     if (insetSQL.rowCount > 0) {
         response = {
@@ -72,10 +87,31 @@ const insertProduct = async (name, price , quantity, image , description) => {
     }
 }
 
+
+
+const updateQuantity = async (quantity , product_id) => {
+    const update = await pool.query(`UPDATE products SET quantity = ${quantity} WHERE id = ${product_id}`)
+    if (update.rowCount > 0) {
+        let response = {
+            status: true
+        }
+        return response
+    } else {
+        let response = {
+            status: false
+        }
+        return response
+    }
+} 
+
 module.exports = {
+                updateQuantity,
                 getProducts, 
                 insertProduct,
                 getDetail, 
                 deletdProduct,
-                updateProduct
+                updateProduct,
+                filterData,
+                getDetailName,
+                filterDataByid
                 }

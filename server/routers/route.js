@@ -5,7 +5,9 @@ const authenticate = require('../controller/authenticate')
 const multer = require('multer');
 const path = require("path");
 const products = require('../controller/products');
-const { log } = require("console");
+const transaction = require('../controller/transaction')
+const moment = require('moment-timezone')
+
 
 router.post("/login", async (req, res) => {
 
@@ -87,10 +89,10 @@ const storage = multer.diskStorage({
 const upload = multer({storage})
 
 router.post('/product/add', upload.single('photo'), async(req , res ) => {
-  const {name , price, quantity, description} = req.body
+  const {name , price, quantity, description, categori} = req.body
   let linkImage = req.protocol + '://' + req.get('host') + "/products/"+ req.file.filename
 
-  const insertProduct = await products.insertProduct(name, price, quantity,linkImage, description)
+  const insertProduct = await products.insertProduct(name, price, quantity,linkImage, description, categori)
   if (insertProduct.status === true) {
 
     res.status(200).json({
@@ -130,10 +132,15 @@ router.get('/delete/:id' , async (req, res) => {
     });
   }
 });
-
+// hide data 
+router.get('/products/hide/:id', async (req, res) => {
+  const id = req.params.id
+  const hideProduct = await products.filterDataByid(id);
+  res.send(hideProduct)
+});
 
 router.post('/products/update',upload.single('photo'),async (req, res) => {
-  const { name , price ,quantity, description, id} = req.body; 
+  const { name , price ,quantity, description, id, categori} = req.body; 
   const Image = '';
   const data = {
     name ,
@@ -141,7 +148,8 @@ router.post('/products/update',upload.single('photo'),async (req, res) => {
     quantity,
     description,
     id,
-    Image
+    Image,
+    categori
   }
   console.log(data);
   if (typeof req.file === 'undefined') {
@@ -150,7 +158,6 @@ router.post('/products/update',upload.single('photo'),async (req, res) => {
     }else{
       data.Image = req.protocol + '://' + req.get('host') + "/products/"+ req.file.filename 
     }  
-    console.log(data.Image);
     const updateAPI = await products.updateProduct(data)
     if (updateAPI.status === true) {
        response = {
@@ -171,6 +178,102 @@ router.get('/product/data',upload.single('photo'),async (req, res) => {
   res.status(200).json({
     data: data
   })
+});
+
+router.get('/products/category/:categori', async (req, res) => {
+  let categori = req.params.categori
+  let data ;
+  if (categori === 'all') {
+    data = await products.getProducts();
+    res.send(data);
+  }else{
+    data = await products.filterData(categori);
+    res.send(data);
+  }
+  console.log(data);
+})
+
+
+
+// get transactions
+router.get('/transactions' , async(req, res) =>{
+  const data = await transaction.getData();
+  res.send(data)
+});
+
+// add transaction 
+router.post('/transaction/add', async(req, res) =>{
+    const {selectOption, custumer, quantity} = req.body;
+    const data = {
+        product_id: selectOption,
+        custumer: custumer,
+        quantity: quantity
+    }
+  const insertTransaction = await transaction.insertData(data);
+  if (insertTransaction.status === true) {
+      res.status(200).json({
+        status: insertTransaction.status,
+        message: insertTransaction.message
+      })
+  } else {
+    res.status(500).json({
+      status: insertTransaction.status,
+      message: insertTransaction.message
+    })
+  }
+});
+
+// get detail
+router.get('/transactions/:id', async (req, res) => {
+  const id = req.params.id;
+  const detailData = await transaction.getDetail(id);
+  const productDetail = await products.getDetailName(detailData.product) 
+  const data = {
+    detailTran: detailData,
+    detailProduct: productDetail  
+  }
+  res.send(data);
+});
+
+router.post('/transaction/update', async (req, res) => {
+  const {product_id, quantity , custumer, transaction_id } = req.body;
+  const data = {
+    product_id: product_id,
+    quantity: quantity,
+    custumer: custumer,
+    transaction_id: transaction_id 
+  }
+ const update = await transaction.update(data);
+});
+
+// filtering kategori 
+router.get('/transaction/:categori' , async (req, res) => {
+  const categori  = req.params.categori
+  if (categori === 'all') {
+      const categoriFilter = await transaction.getData()
+      res.send(categoriFilter)  
+  }else{
+    const categoriFilter = await transaction.filterCategori(categori);
+    res.send(categoriFilter)
+  }
+});
+
+// delete transaction 
+router.delete('/delete/transaction/:id', async(req, res) =>{
+    const id =  req.params.id;
+    console.log(id);
+    const deleted = await transaction.deleted(id);
+    if (deleted.status == true) {
+      res.status(200).json({
+        status: true,
+        message: 'delete successfully'
+      })
+    }else{
+      res.status(500).json({
+        status: false,
+        message: 'delete failed'
+      })
+    }
 });
 
 module.exports = router;
