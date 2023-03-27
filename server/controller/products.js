@@ -1,6 +1,6 @@
 const {pool} = require('../db')
 const randomstring = require('randomstring');
-
+const Report = require('./reports'); 
 
 const getProducts = async () => {
     const data = await pool.query(`SELECT * FROM products ORDER BY created_at DESC`)
@@ -25,16 +25,11 @@ const filterDataByid = async (id) => {
 
 
 const deletdProduct = async (id) => {
-    const QueryDelete = await pool.query(`DELETE FROM products WHERE id = ${id}`)
-    if (QueryDelete.rowCount > 0) {
-        return response = {
-            status: true
-        }
-    }else{
-        return response = {
-            status: true
-        }
-    }
+    var array = JSON.parse("[" + id + "]");
+    array.forEach(async idr => {
+    await pool.query(`DELETE FROM products WHERE id = ${idr}`)
+  });
+  return { status: true }
 }
 
 const getDetailName = async (name) => {
@@ -77,6 +72,15 @@ const insertProduct = async (name, price , quantity, image , description, catego
             status: true,
             data: 'add products sucessfully '
         }
+        let data = {
+            product: name,
+            quantity: quantity,
+            status: true,
+            date: created_at,
+            
+        }
+        const reports = await Report.insert(data)
+        console.log(reports);
         return response;
     }else{
         response = {
@@ -87,11 +91,11 @@ const insertProduct = async (name, price , quantity, image , description, catego
     }
 }
 
-
+ 
 
 const updateQuantity = async (quantity , product_id) => {
     const update = await pool.query(`UPDATE products SET quantity = ${quantity} WHERE id = ${product_id}`)
-    if (update.rowCount > 0) {
+    if (update.rowCount > 0) { 
         let response = {
             status: true
         }

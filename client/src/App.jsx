@@ -8,11 +8,10 @@ import Resetpassword from './components/page/resetpass';
 import BarangPage from './components/index/barang'
 import CategoryPage from './components/index/category';
 import Transaction from './components/index/transaction';
-
+import Report from './components/index/reports';
 
 function App() {
     const { token, setToken } = useToken();
-
     if (!token) {
         return (
             <div>
@@ -25,8 +24,7 @@ function App() {
             </Router>
             </div>
         )
-    }
-
+    }   
     return (
         <div>
             <Router>
@@ -35,6 +33,7 @@ function App() {
                     < Route exact path='/products' render={(props) => < BarangPage/>}></Route>
                     < Route exact path='/transaction' render={(props) => < Transaction/>}></Route>
                     < Route exact path='/category' render={(props) => < CategoryPage/>}></Route>
+                    < Route exact path='/reports' render={(props) => < Report/>}></Route>
                 </Switch>
             </Router>
         </div>

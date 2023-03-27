@@ -2,7 +2,8 @@ import { upload } from "@testing-library/user-event/dist/upload";
 import React, { Component, useEffect, useState } from "react";
 import { FormatRupiah } from "@arismun/format-rupiah";
 import Pagination from "../table/pagination";
-
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 
 export default function Barang() {
@@ -21,9 +22,12 @@ export default function Barang() {
   const [update_at, setUpdateAt] = useState("");
   const [image, setImage] = useState("http://localhost:5000/products/png-1679294291272.png");
   const [saveImgae, setImageSave] = useState("");
-
+  //pagination 
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(7);
+  // sweet alerts
+  const MySwal = withReactContent(Swal);
+
 
   const handleImage = (e) => {
     console.log(e);
@@ -68,6 +72,38 @@ export default function Barang() {
     } else if (req.status === false) {
       setErr();
     }
+  };
+
+  // delete 
+  const deleted = async () => {
+    let arrayID = [];
+      dataProducts.forEach(d => {
+        if (d.select) {
+          arrayID.push(d.id);
+        }
+      })
+    MySwal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("http://localhost:5000/product/delete/".concat(arrayID), {
+          method: "DELETE",
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            console.log(result);
+            if (result.status === true) {
+              window.location.reload();
+            }
+          });
+      }
+    });
   };
   
   // update barang
@@ -186,6 +222,7 @@ export default function Barang() {
           <div className="card">
             {/* /.card-header */}
             <div className="card-body">
+            <div style={{ paddingBottom: "-39%", marginBottom: "-2%" }}>
               <input
                 type="text"
                 className="form-control mb-4"
@@ -206,6 +243,34 @@ export default function Barang() {
                <option value="sofware">Sofware</option>  
                <option value="hardware">Hardware</option>  
               </select>
+              <button
+                  className={"btn btn-success  mb-4"}
+                  id="export-excel-product"
+                  style={{
+                    // width: '20%',
+                    marginLeft: "43%",
+                    marginTop: "-90px",
+                  }}
+                >
+                  {" "}
+                  <i class="fa-solid fa-file-csv"></i>
+                </button>
+                <button
+                  className={"btn btn-danger  mb-4"}
+                  style={{
+                    // width: '20%',
+                    marginLeft: "1%",
+                    marginTop: "-90px",
+                  }}
+                  onClick={() => {
+                    deleted()
+                  }}
+                  id="deleted-product"
+                >
+                  {" "}
+                  <i class="fa fa-trash " aria-hidden="true"></i>
+                </button>
+                </div>
               <table id="" className="table table-bordered table-striped mb-3">
                 <thead>
                   <tr
@@ -213,6 +278,23 @@ export default function Barang() {
                       textAlign: "center",
                     }}
                   >
+                     <th>
+                      <input
+                        class="form-check-input check"
+                        style={{ marginLeft: "-8px", marginTop: "-15px" }}
+                        type="checkbox"
+                        onClick={(e) => {
+                          let value = e.target.checked;
+                          setDataProducts(
+                            dataProducts.map((d) => {
+                              d.select = value;
+                              return d;
+                            })
+                          );
+                        }}
+                        id="deleted"
+                      />
+                    </th>
                     <th>Item Code</th>
                     <th>Name</th>
                     <th>Quantity</th>
@@ -242,6 +324,26 @@ export default function Barang() {
                               textTransform: 'capitalize'
                             }}
                           >
+                              <td>
+                              <input
+                                class="form-check-input"
+                                style={{ marginLeft: "-8px" }}
+                                type="checkbox"
+                                checked={product.select}
+                                onChange={(e) => {
+                                  let value = e.target.checked;
+                                  setDataProducts(
+                                    dataProducts.map((d) => {
+                                      if (d.id === product.id) {
+                                        d.select = value;
+                                      }
+                                      return d;
+                                    })
+                                  );
+                                }}
+                                id="rows"
+                              />
+                            </td>
                             <td>#{product.item_code}</td>
                             <td>{product.name_product}</td>
                             <td>{product.quantity}</td>
@@ -421,19 +523,12 @@ export default function Barang() {
             <div className="modal-footer justify-content">
               <button
                 type="button"
-                className="btn btn-danger delete-product"
-                data-id={id}
-              >
-                Delete
-              </button>
-              <button
-                type="button"
                 className="btn btn-info products-update"
                 data-toggle="modal"
                 data-target="#modal-lg-update"
                 onClick={() => detail(id)}
               >
-                Update
+                 <i class="fa fa-edit " aria-hidden="true"></i> Edit
               </button>
             </div>
           </div>

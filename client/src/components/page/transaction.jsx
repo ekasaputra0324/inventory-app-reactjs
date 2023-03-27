@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Pagination from "../table/pagination";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-
+import moment from "moment/moment";
 async function APIadd(data) {
   return fetch("http://localhost:5000/transaction/add", {
     method: "POST",
@@ -22,13 +22,12 @@ export default function Transaction() {
   const [quantity, setQuantity] = useState("");
   const [custumer, setCustumer] = useState("");
   const [ProductId, setProductId] = useState("");
-  const [idP, setIdP ] = useState("");
+  const [idP, setIdP] = useState("");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(5);
   const MySwal = withReactContent(Swal);
   const [id, setId] = useState();
-
 
   // GET DATA TRANSACTION
   useEffect(() => {
@@ -51,7 +50,6 @@ export default function Transaction() {
       });
   }, []);
 
-  
   // add data
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,29 +75,30 @@ export default function Transaction() {
       setErr(reaponse.status);
     }
   };
-  //hnadel update  
+  //hnadel update
   const handleUpdate = async (e) => {
     e.preventDefault();
-    
+
     const data = {
       product_id: selectOption,
-      quantity:  quantity,
-      custumer:   custumer,
-      transaction_id:  id
-      }
-    
+      quantity: quantity,
+      custumer: custumer,
+      transaction_id: id,
+    };
+
     if (!selectOption) {
-      data.product_id = idP.id
+      data.product_id = idP.id;
     }
 
-    await fetch('http://localhost:5000/transaction/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then(res => res.json())
-      .then(data => {
+    await fetch("http://localhost:5000/transaction/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((data) => {
         if (data.status === true) {
           let reaponse = {
             status: true,
@@ -114,11 +113,16 @@ export default function Transaction() {
           };
           setErr(reaponse.status);
         }
-      })     
-  }
+      });
+  };
   // handle delete
-  const deleted = async (id) => {
-    console.log(id);
+  const deleted = async () => {
+    let arrayID = [];
+      data.forEach(d => {
+        if (d.select) {
+          arrayID.push(d.id);
+        }
+      })
     MySwal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -129,11 +133,12 @@ export default function Transaction() {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch("http://localhost:5000/delete/transaction/".concat(id), {
+        fetch("http://localhost:5000/delete/transaction/".concat(arrayID), {
           method: "DELETE",
         })
           .then((res) => res.json())
           .then((result) => {
+            console.log(result);
             if (result.status === true) {
               window.location.reload();
             }
@@ -263,16 +268,51 @@ export default function Transaction() {
                   }}
                 >
                   {" "}
-                  Export Excel
+                  <i class="fa-solid fa-file-csv"></i>
+                </button>
+                <button
+                  className={"btn btn-danger  mb-4"}
+                  style={{
+                    // width: '20%',
+                    marginLeft: "1%",
+                    marginTop: "-90px",
+                  }}
+                  onClick={() => {
+                    deleted()
+                  }}
+                  id="deleted-transaction"
+                >
+                  {" "}
+                  <i class="fa fa-trash " aria-hidden="true"></i>
                 </button>
               </div>
-              <table id="transaction" className="table table-bordered table-striped mb-4">
+              <table
+                id="transaction"
+                className="table table-bordered table-striped mb-4"
+              >
                 <thead>
                   <tr
                     style={{
                       textAlign: "center",
                     }}
                   >
+                    <th>
+                      <input
+                        class="form-check-input check"
+                        style={{ marginLeft: "-8px", marginTop: "-15px" }}
+                        type="checkbox"
+                        onClick={(e) => {
+                          let value = e.target.checked;
+                          setData(
+                            data.map((d) => {
+                              d.select = value;
+                              return d;
+                            })
+                          );
+                        }}
+                        id="deleted"
+                      />
+                    </th>
                     <th>Transaction code</th>
                     <th>Custumer</th>
                     <th>Product</th>
@@ -280,7 +320,7 @@ export default function Transaction() {
                     <th>Price</th>
                     <th>Total</th>
                     <th>Date</th>
-                    <th></th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -288,9 +328,10 @@ export default function Transaction() {
                     <tr
                       style={{
                         textAlign: "center",
-                        textTransform: 'capitalize'
+                        textTransform: "capitalize",
                       }}
                     >
+                      <td></td>
                       <td></td>
                       <td></td>
                       <td>Data not found</td>
@@ -310,9 +351,29 @@ export default function Transaction() {
                           <tr
                             style={{
                               textAlign: "center",
-                              textTransform: 'capitalize'
+                              textTransform: "capitalize",
                             }}
                           >
+                            <td>
+                              <input
+                                class="form-check-input"
+                                style={{ marginLeft: "-8px" }}
+                                type="checkbox"
+                                checked={transaction.select}
+                                onChange={(e) => {
+                                  let value = e.target.checked;
+                                  setData(
+                                    data.map((d) => {
+                                      if (d.id === transaction.id) {
+                                        d.select = value;
+                                      }
+                                      return d;
+                                    })
+                                  );
+                                }}
+                                id="deleted"
+                              />
+                            </td>
                             <td>#{transaction.transaction_code}</td>
                             <td>{transaction.custumer}</td>
                             <td>{transaction.product}</td>
@@ -326,10 +387,14 @@ export default function Transaction() {
                             <td>{transaction.created_at}</td>
                             <td>
                               <button
-                                className="btn btn-danger mr-2"
+                                className="btn btn-warning mr-2"
                                 onClick={() => deleted(transaction.id)}
+                                style={{
+                                  color: "white",
+                                }}
+                                disabled
                               >
-                                <i class="fa fa-trash " aria-hidden="true"></i>
+                                <i class="fa-solid fa-receipt"></i>
                               </button>
                               <button
                                 className="btn btn-info"
@@ -482,7 +547,11 @@ export default function Transaction() {
               </div>
             )}
             <form onSubmit={handleUpdate}>
-              <input type="hidden" value={id} onChange={e => setId(e.target.value)} />
+              <input
+                type="hidden"
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+              />
               <div className="modal-body">
                 <div class="mb-3">
                   <label className="form-label mb-2">Products</label>

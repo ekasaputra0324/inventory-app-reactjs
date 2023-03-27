@@ -1,6 +1,6 @@
 const { pool } = require("../db");
 const product = require("./products");
-
+const Report = require("./reports");
 const getData = async () => {
   const GetSQL = await pool.query(
     `SELECT * FROM transactions ORDER BY created_at DESC`
@@ -66,6 +66,15 @@ const insertData = async (data) => {
         detail.quantity - quantity,
         product_id
       );
+      let dataReports = {
+        product: detail.name_product,
+        quantity: data.quantity,
+        status: false,
+        date: date,
+        
+    } 
+    const reports = await Report.insert(dataReports)
+    console.log(reports);
       console.log(updateQuantity);
       let response = {
         status: true,
@@ -77,24 +86,13 @@ const insertData = async (data) => {
 };
 
 const deleted = async (id) => {
-  const deleteSQL = await pool.query(
-    `delete from transactions where id = ${id}`
-  );
-  if (deleteSQL.rowCount > 0) {
-    let response = {
-      status: true,
-      message: deleteSQL.rows[0],
-    };
-    return response;
-  } else {
-    let response = {
-      status: false,
-      message: "delered failed",
-    };
-    return response;
-  }
+  var array = JSON.parse("[" + id + "]");
+  array.forEach(async idr => {
+    await pool.query(`DELETE FROM transactions WHERE id = ${idr}`)
+  });
+  return { status: true }
 };
-
+ 
 const update = async (data) => {
   
   let id = data.transaction_id;

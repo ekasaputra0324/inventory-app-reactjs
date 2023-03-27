@@ -103,15 +103,16 @@ export default class Sidebar extends Component {
                     <p>Transactions</p>
                   </a>
                 </li>
-               
-               
                 <li className="nav-item">
-                  <a href="#" className="nav-link">
+                  <a
+                    href="/reports"
+                    className={`nav-link ${
+                      activeLink === '/reports' ? 'active' : ''
+                    } loading`}
+                    onClick={() => this.setActiveLink('/reports')}
+                  >
                     <i className="nav-icon fas fa-chart-pie" />
-                    <p>
-                      Reports
-                      {/* <i className="right fas fa-angle-left" /> */}
-                    </p>
+                    <p>Reports</p>
                   </a>
                 </li>
                 <li className="nav-item">

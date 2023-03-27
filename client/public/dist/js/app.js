@@ -12,7 +12,7 @@ $(function () {
                 Swal.fire({
                     title: 'Loading..',
                     html: message,
-                    timer: 2000,
+                    timer: 1000,
                     timerProgressBar: true,
                     didOpen: () => {
                         Swal.showLoading()
@@ -53,24 +53,8 @@ $(function () {
 
 
     }
-    $('.delete-product').click(async function (e) {
-        let id = $(this).attr('data-id')
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            // cancelButtonColor: '#DCDCDC',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'http://localhost:5000/delete/'.concat(id)
-            }
-        })
-    });
-
     $('.products-update').click(function (e) {
+        console.log("oke");
         $('.products-detail').modal('toggle')
     });
 
@@ -81,7 +65,6 @@ $(function () {
             text: "if you logout the application session will end!",
             icon: 'warning',
             confirmButtonColor: '#d33',
-            // cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, logout it!'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -100,4 +83,52 @@ $(function () {
         filename: 'transaction.csv'
     })
    });
+
+
+   const transaction = fetch('http://localhost:5000/transactions', {
+     method: 'GET',
+     headers: {
+        'Content-Type': 'application/json',
+     }
+   }).then(res => res.json())
+     .then(data => {
+        if (data.length < 1) {
+           $('#deleted-transaction').prop('disabled', true);   
+           $('#export-excel-transaction').prop('disabled', true);  
+        }else if (data.length > 1){
+            $('#deleted-transaction').prop('disabled', false);  
+            $('#export-excel-transaction').prop('disabled', false);  
+        }
+    })
+
+    const product = fetch('http://localhost:5000/product/data', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(res => res.json())
+      .then(data => {
+            if (data.data.length > 1) {
+                $('#deleted-product').prop('disabled', true)   
+                $('#export-excel-product').prop('disabled', false)  
+            }else if(data.data.length < 1){
+                $('#deleted-product').prop('disabled', true)   
+                $('#export-excel-product').prop('disabled', true);  
+            }
+      })
+    //   checkbox
+    $('.check').click(function (e) { 
+        const value = $(".check").is(":checked");
+        console.log(rows);
+        if (value === true) {
+            $('#deleted-product').prop('disabled', false);  
+        }else if(value === false) {
+            $('#deleted-product').prop('disabled', true);  
+        }     
+    });
+
+    $('#rows').click(function (e) { 
+       
+    });
 });
+

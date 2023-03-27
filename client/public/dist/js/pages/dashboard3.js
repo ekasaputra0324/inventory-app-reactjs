@@ -26,7 +26,7 @@ $(function () {
         {
           backgroundColor: '#ced4da',
           borderColor: '#ced4da',
-          data: [700, 1700, 2700, 2000, 1800, 1500, 2000]
+          data: [200, 1700, 2700, 2000, 1800, 1500, 2000]
         }
       ]
     },
@@ -45,7 +45,6 @@ $(function () {
       },
       scales: {
         yAxes: [{
-          // display: false,
           gridLines: {
             display: true,
             lineWidth: '4px',

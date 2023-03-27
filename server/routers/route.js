@@ -7,7 +7,7 @@ const path = require("path");
 const products = require('../controller/products');
 const transaction = require('../controller/transaction')
 const moment = require('moment-timezone')
-
+const reports = require('../controller/reports')
 
 router.post("/login", async (req, res) => {
 
@@ -120,11 +120,12 @@ router.get('/getDetail/:id', async (req, res) => {
 });
 
 
-router.get('/delete/:id' , async (req, res) => {
-  const id = req.params.id;
-  const deleted = await products.deletdProduct(id)
+router.delete('/product/delete/:id' , async (req, res) => {
+  console.log(req.params.id);
+  const deleted = await products.deletdProduct(req.params.id)
+  console.log(deleted);
   if (deleted.status === true) {
-      res.redirect('http://localhost:3000/products') 
+      res.send({status: true});
   }else{
     res.status(500).json({
       status: false,
@@ -247,6 +248,9 @@ router.post('/transaction/update', async (req, res) => {
  res.send(update);
 });
 
+
+
+
 // filtering kategori 
 router.get('/transaction/:categori' , async (req, res) => {
   const categori  = req.params.categori
@@ -261,10 +265,10 @@ router.get('/transaction/:categori' , async (req, res) => {
 
 // delete transaction 
 router.delete('/delete/transaction/:id', async(req, res) =>{
-    const id =  req.params.id;
-    console.log(id);
-    const deleted = await transaction.deleted(id);
-    if (deleted.status == true) {
+
+    const deleted = await transaction.deleted(req.params.id);
+    console.log(deleted.status);
+    if (deleted.status === true) {
       res.status(200).json({
         status: true,
         message: 'delete successfully'
@@ -275,6 +279,18 @@ router.delete('/delete/transaction/:id', async(req, res) =>{
         message: 'delete failed'
       })
     }
+});
+
+
+// reports 
+router.get('/reports', async (req, res) => {
+  const data = await reports.all();
+  res.send(data);
+});
+
+router.delete('/reports/delete/:id', async (req, res) => {
+    const result =  await reports.deleted(req.params.id);
+    console.log(result);
 });
 
 module.exports = router;
