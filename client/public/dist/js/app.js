@@ -109,7 +109,6 @@ $(function () {
     }).then(res => res.json())
       .then(data => {
             if (data.data.length > 1) {
-                $('#deleted-product').prop('disabled', true)   
                 $('#export-excel-product').prop('disabled', false)  
             }else if(data.data.length < 1){
                 $('#deleted-product').prop('disabled', true)   
@@ -117,18 +116,14 @@ $(function () {
             }
       })
     //   checkbox
-    $('.check').click(function (e) { 
-        const value = $(".check").is(":checked");
-        console.log(rows);
-        if (value === true) {
-            $('#deleted-product').prop('disabled', false);  
-        }else if(value === false) {
-            $('#deleted-product').prop('disabled', true);  
-        }     
-    });
+    
 
-    $('#rows').click(function (e) { 
-       
+    
+    // 
+    $('#export-excel-product').click(function (e) { 
+        $("#products").table2csv({
+            filename: 'products.csv'
+        })
     });
 });
 

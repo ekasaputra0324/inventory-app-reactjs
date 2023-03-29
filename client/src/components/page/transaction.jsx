@@ -221,11 +221,9 @@ export default function Transaction() {
             data-target="#modal-default"
           >
             {" "}
-            Add Transaction
+             CREATE 
           </button>
-
           {/* Default box */}
-
           <div className="card">
             {/* /.card-header */}
             <div className="card-body">
@@ -259,22 +257,10 @@ export default function Transaction() {
                   <option value="hardware">Hardware</option>
                 </select>
                 <button
-                  className={"btn btn-success  mb-4"}
-                  id="export-excel-transaction"
-                  style={{
-                    // width: '20%',
-                    marginLeft: "43%",
-                    marginTop: "-90px",
-                  }}
-                >
-                  {" "}
-                  <i class="fa-solid fa-file-csv"></i>
-                </button>
-                <button
                   className={"btn btn-danger  mb-4"}
                   style={{
                     // width: '20%',
-                    marginLeft: "1%",
+                    marginLeft: "43%",
                     marginTop: "-90px",
                   }}
                   onClick={() => {
@@ -313,13 +299,13 @@ export default function Transaction() {
                         id="deleted"
                       />
                     </th>
-                    <th>Transaction code</th>
+                    <th>Date</th>
                     <th>Custumer</th>
                     <th>Product</th>
+                    <th>Serial Number</th>
                     <th>Quantity</th>
                     <th>Price</th>
                     <th>Total</th>
-                    <th>Date</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -374,9 +360,10 @@ export default function Transaction() {
                                 id="deleted"
                               />
                             </td>
-                            <td>#{transaction.transaction_code}</td>
+                            <td>{moment(transaction.created_at).format('DD/MM/YYYY HH:mm')}</td>
                             <td>{transaction.custumer}</td>
                             <td>{transaction.product}</td>
+                            <td>#{transaction.transaction_code}</td>
                             <td>{transaction.quantity}</td>
                             <td>
                               {<FormatRupiah value={transaction.price} />}
@@ -384,18 +371,7 @@ export default function Transaction() {
                             <td>
                               {<FormatRupiah value={transaction.total} />}
                             </td>
-                            <td>{transaction.created_at}</td>
                             <td>
-                              <button
-                                className="btn btn-warning mr-2"
-                                onClick={() => deleted(transaction.id)}
-                                style={{
-                                  color: "white",
-                                }}
-                                disabled
-                              >
-                                <i class="fa-solid fa-receipt"></i>
-                              </button>
                               <button
                                 className="btn btn-info"
                                 data-toggle="modal"
@@ -431,7 +407,7 @@ export default function Transaction() {
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h4 className="modal-title">Add Transaction</h4>
+              <h4 className="modal-title">New Transaction</h4>
               <button
                 type="button"
                 className="close"
@@ -463,10 +439,14 @@ export default function Transaction() {
                   <label className="form-label mb-2">Products</label>
                   <select
                     class="form-select"
+                    id="select"
                     aria-label="Default select example"
                     onChange={(e) => setSelectOption(e.target.value)}
+                    style={{ 
+                      textTransform: 'capitalize'
+                     }}
                   >
-                    <option selected value={""}>
+                    <option selected value={""} id="option">
                       Select product
                     </option>
                     {dataProduct.map((product) => (

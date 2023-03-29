@@ -9,6 +9,7 @@ import BarangPage from './components/index/barang'
 import CategoryPage from './components/index/category';
 import Transaction from './components/index/transaction';
 import Report from './components/index/reports';
+import Applog from './components/index/applog';
 
 function App() {
     const { token, setToken } = useToken();
@@ -31,9 +32,10 @@ function App() {
                 <Switch>
                     < Route exact path='/' render={(props) => <Index />}></Route>
                     < Route exact path='/products' render={(props) => < BarangPage/>}></Route>
+                    < Route exact path='/app-log' render={(props) => < Applog/>}></Route>
                     < Route exact path='/transaction' render={(props) => < Transaction/>}></Route>
                     < Route exact path='/category' render={(props) => < CategoryPage/>}></Route>
-                    < Route exact path='/reports' render={(props) => < Report/>}></Route>
+                    < Route exact path='/movehistories' render={(props) => < Report/>}></Route>
                 </Switch>
             </Router>
         </div>
