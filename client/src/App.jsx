@@ -32,7 +32,7 @@ function App() {
                 <Switch>
                     < Route exact path='/' render={(props) => <Index />}></Route>
                     < Route exact path='/products' render={(props) => < BarangPage/>}></Route>
-                    < Route exact path='/app-log' render={(props) => < Applog/>}></Route>
+                    < Route exact path='/applog' render={(props) => < Applog/>}></Route>
                     < Route exact path='/transaction' render={(props) => < Transaction/>}></Route>
                     < Route exact path='/category' render={(props) => < CategoryPage/>}></Route>
                     < Route exact path='/movehistories' render={(props) => < Report/>}></Route>

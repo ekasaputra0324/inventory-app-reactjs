@@ -320,8 +320,8 @@ export default function Transaction() {
                       <td></td>
                       <td></td>
                       <td></td>
-                      <td>Data not found</td>
                       <td></td>
+                      <td>Data not found</td>
                       <td></td>
                       <td></td>
                       <td></td>

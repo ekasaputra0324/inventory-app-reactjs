@@ -71,10 +71,9 @@ const insertData = async (data) => {
         quantity: data.quantity,
         status: false,
         date: date,
-        
-    } 
-    const reports = await Report.insert(dataReports)
-    console.log(reports);
+      };
+      const reports = await Report.insert(dataReports);
+      console.log(reports);
       console.log(updateQuantity);
       let response = {
         status: true,
@@ -87,14 +86,13 @@ const insertData = async (data) => {
 
 const deleted = async (id) => {
   var array = JSON.parse("[" + id + "]");
-  array.forEach(async idr => {
-    await pool.query(`DELETE FROM transactions WHERE id = ${idr}`)
+  array.forEach(async (idr) => {
+    await pool.query(`DELETE FROM transactions WHERE id = ${idr}`);
   });
-  return { status: true }
+  return { status: true };
 };
- 
+
 const update = async (data) => {
-  
   let id = data.transaction_id;
   let custumer = data.custumer;
   let product_id = data.product_id;
@@ -123,7 +121,7 @@ const update = async (data) => {
                                                update_at = '${date}'
                                                WHERE id = ${id}
                                                `);
-     if (updateSQL.rowCount > 0) {
+    if (updateSQL.rowCount > 0) {
       const updateQuantity = await product.updateQuantity(
         detail.quantity - quantity,
         product_id

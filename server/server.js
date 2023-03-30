@@ -9,15 +9,14 @@ const server = require('http').createServer(app);
 const routeIndex = require('./routers/route');
 const path = require('path');
 const { Server } = require('socket.io');
+const cookieParser = require('cookie-parser');
 
-
-
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")))
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set(express.static(path.join(__dirname, 'public')));
-
 
 
 const io = new Server(server, {
@@ -34,6 +33,7 @@ app.use(cors({
 }));
 
 
+
 app.use(
     session({
         secret: process.env.COOKIE_SECRET,
@@ -47,13 +47,12 @@ app.use(
             sameSite: process.env.ENVIRONMENT === "production" ? "none" : "lax"
         }
     })
-)
+    )
 
+    
+    app.use('/', routeIndex); 
+    io.on('connect', socket => { });
 
-app.use('/', routeIndex); 
-io.on('connect', socket => { });
-
-
-app.listen(5000, () => {
-    console.log('listening on port * 5000' );
+    app.listen(5000, () => {
+        console.log('listening on port * 5000' );
 })

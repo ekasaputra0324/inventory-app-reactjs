@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import moment from "moment/moment";
 import Pagination from "../table/pagination";
-
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 export default function Reports() {
   const [reports, setReports] = useState([]);
   const [id, setId] = useState([]);
@@ -13,6 +14,7 @@ export default function Reports() {
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   let currentPosts = reports.slice(indexOfFirstPost, indexOfLastPost);
+  const MySwal = withReactContent(Swal);
 
   // change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -41,20 +43,56 @@ export default function Reports() {
     }).then((res) => res.json());
   };
 
-  const MultipleDelete = () => {
+  const MultipleDelete = async () => {
     let arrayID = [];
+    let message = "";
+    let count = 0;
     reports.forEach((d) => {
       if (d.select) {
         arrayID.push(d.id);
       }
     });
-    fetch("http://localhost:5000/reports/delete/".concat(arrayID), {
-      method: "DELETE",
+
+  if (arrayID.length === 1) {
+      message = 'This data will be permanently deleted'
+  } else if (arrayID.length >= 2) {
+        message = `These ${reports.length} data will be permanently deleted`
+  }else if (arrayID.length < 1) {
+    count = 1;
+    message = 'Please select the data to be deleted!!'
+  }
+
+  if (count === 1) {
+    MySwal.fire({
+      text: `${message}`,
+      icon: "warning",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "",
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-      });
+  }else{
+    MySwal.fire({
+      title: "Are you sure?",
+      text: `${message}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonColor: "",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`http://localhost:5000/reports/delete/${arrayID}`, {
+          method: "DELETE",
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            console.log(result);
+            if (result.status === true) {
+              window.location.reload(); 
+            }
+          });
+      }
+    });
+  }
   };
 
   return (
@@ -186,7 +224,7 @@ export default function Reports() {
                         >
                           <td>
                             <input
-                              class="form-check-input"
+                              class="form-check-input" 
                               style={{ marginLeft: "-8px" }}
                               type="checkbox"
                               checked={report.select}
@@ -206,7 +244,7 @@ export default function Reports() {
                           </td>
                           <td>{moment(report.date).format("DD/MM/YYYY HH:mm")}</td>
                           <td>{report.reference}</td>
-                          <td>{report.product} (#{report.code})</td>
+                          <td>{report.product} (P-{report.code})</td>
                           <td>P-{report.serial_code}</td>
                           <td>{report.from_location}</td>
                           <td>{report.to_location}</td>

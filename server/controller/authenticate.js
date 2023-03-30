@@ -6,7 +6,6 @@ const bycrpt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
 
-
 // Definisikan fungsi login async
 const login = async (email , password) => {
   console.log(email, password); // Print email dan password di konsol
@@ -34,13 +33,14 @@ const login = async (email , password) => {
         session.user = {
           email: email,
           id: potentiallogin.rows[0].id,
-        };
-
+          name: potentiallogin.rows[0].name,
+        }
         // Buat objek data untuk dikembalikan
         let data = {
           name: potentiallogin.rows[0].name,
           status: true
         }
+
         return data;
 
       } else {

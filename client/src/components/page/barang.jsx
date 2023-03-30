@@ -22,6 +22,7 @@ export default function Barang() {
   const [updated_at, setUpdateAt] = useState("");
   const [created_at, setCreatedAt] = useState("");
   const [cost , setCost] = useState("");
+  const [Unitscost , setUnitsCost] = useState("");
   const [from , setFrom] = useState("");
 
   const [image, setImage] = useState("http://localhost:5000/products/png-1679294291272.png");
@@ -91,6 +92,7 @@ export default function Barang() {
       ).then((data) => data.json());
   
       setCategori(dataDetail.data.category);
+      setUnitsCost(dataDetail.data.units_cost);
       setNama(dataDetail.data.name_product);
       setSellingPrice(dataDetail.data.selling_price);
       setQuantity(dataDetail.data.quantity);
@@ -107,12 +109,17 @@ export default function Barang() {
   const deleted = async () => {
     let message = "";
     let arrayID = [];
+    let count = 0;
+    let user = JSON.parse(localStorage.getItem('token'));
     dataProducts.forEach((d) => {
       if (d.select) {
         arrayID.push(d.id);
         console.log(d.id);
       }
     });
+
+    
+
     if (arrayID.length === 1) {
       await fetch(`http://localhost:5000/products/getDetail/${arrayID[0]}`, {
         method: "GET",
@@ -124,7 +131,7 @@ export default function Barang() {
         .then((data) => {
           setDetail(data.data);
           console.log(detailP);
-          message = `Product data with code #${data.data.item_code} will be permanently deleted!`;
+          message = `Product data with code P-${data.data.item_code} will be permanently deleted!`;
         });
     } else if (arrayID.length >= 2) {
       await fetch(`http://localhost:5000/products/multiple/detail/${arrayID}`, {
@@ -137,29 +144,42 @@ export default function Barang() {
         .then((data) => {
           message = `These ${data.length} data will be permanently deleted`
         });
+    }else if (arrayID.length < 1) {
+      count = 1;
+      message = 'Please select the data to be deleted!!'
     }
-    MySwal.fire({
-      title: "Are you sure?",
-      text: `${message}`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`http://localhost:5000/product/delete/${arrayID}`, {
-          method: "DELETE",
-        })
-          .then((res) => res.json())
-          .then((result) => {
-            console.log(result);
-            if (result.status === true) {
-              window.location.reload();
-            }
-          });
-      }
-    });
+
+    if (count === 1) {
+      MySwal.fire({
+        text: `${message}`,
+        icon: "warning",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "",
+      })
+    }else{
+      MySwal.fire({
+        title: "Are you sure?",
+        text: `${message}`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonColor: "",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`http://localhost:5000/product/delete/${arrayID}/${user.name}`, {
+            method: "DELETE",
+          })
+            .then((res) => res.json())
+            .then((result) => {
+              console.log(result);
+              if (result.status === true) {
+                window.location.reload();
+              }
+            });
+        }
+      });
+    }
   };
   
   // update barang
@@ -173,6 +193,7 @@ export default function Barang() {
     data.append("quantity", quantity);
     data.append("description", description);
     data.append("done_by", dataUser.name );
+    data.append("cost", cost );
     data.append("id", id);
     data.append('categori', categori)
 
@@ -341,7 +362,8 @@ export default function Barang() {
                     </th>
                     <th>Serial Number</th>
                     <th>Name Product</th>
-                    <th>On Hand</th>
+                    <th>Quantity</th>
+                    <th>Cost Total</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -352,7 +374,6 @@ export default function Barang() {
                       textAlign: 'center'
                      }}
                     >
-                      <td></td>
                       <td></td>
                       <td></td>
                       <td>Data not found</td>
@@ -392,6 +413,7 @@ export default function Barang() {
                             <td>P-{product.item_code}</td>
                             <td>{product.name_product}</td>
                             <td>{product.quantity} Units</td>
+                            <td>{<FormatRupiah value={product.cost} />}</td>
                             <td>
                               <button 
                                 className="btn btn-info mr-2"
@@ -476,7 +498,7 @@ export default function Barang() {
                     className="form-control mb-3"
                     id="Price"
                     required
-                    placeholder="Cost"
+                    placeholder="Units Cost"
                     onChange={(e) => setCost(e.target.value)}
                   />
                   <input
@@ -566,11 +588,12 @@ export default function Barang() {
                 <li class="list-group-item">
                    Product Name : {nama}
                 </li>
+                
                 <li class="list-group-item">
                   Price : {<FormatRupiah value={sellingPrice} />}
                 </li>
                 <li class="list-group-item">
-                  Cost : {<FormatRupiah value={cost} />}
+                Units Cost: {<FormatRupiah value={cost} />}
                 </li>
                 <li class="list-group-item">Quantity : {quantity} </li>
                 <li class="list-group-item">
@@ -625,7 +648,7 @@ export default function Barang() {
                 style={{
                   height: "280px",
                   width: "350px",
-                  marginBottom: "-43%",
+                  marginBottom: "-48%",
                   marginLeft: "10%",
                 }}
               ></img>
@@ -644,6 +667,7 @@ export default function Barang() {
                     placeholder={nama}
                     onChange={(e) => setNama(e.target.value)}
                   />
+                  
               <select class="form-select  mb-2" aria-label="Default select example" id="select" onChange={e => setCategori(e.target.value)}>
                 {categori === 'sofware' ? 
                 <><option value="sofware" selected>Sofware</option><option value="hardware">Hardware</option></>  
@@ -656,6 +680,12 @@ export default function Barang() {
                     class="form-control mb-2"
                     placeholder={sellingPrice}
                     onChange={(e) => setSellingPrice(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    class="form-control mb-2"
+                    placeholder={Unitscost}
+                    onChange={(e) => setUnitsCost(e.target.value)}
                   />
                   <input
                     type="text"
